@@ -6,6 +6,26 @@
 *.tgz
 *.zip
 
+# data
+*.csv
+*.dat
+*.db
+*.dbf
+*.dif
+*.json
+*.jsonc
+*.ods
+*.ots
+*.tsv
+*.xlm
+*.xls
+*.xlsm
+*.xlsx
+*.xlt
+*.xltm
+*.xltx
+*.xml
+
 # logs
 logs
 *.log

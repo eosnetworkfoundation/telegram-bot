@@ -1,0 +1,18 @@
+{
+  "name": "telegram-bot",
+  "version": "0.0.1",
+  "description": "Serverless JavaScript project to deliver IM messages via Telegram using an Amazon Web Services (AWS) Lambda.",
+  "main": "handler.js",
+  "repository": "git@github.com:eosnetworkfoundation/telegram-bot.git",
+  "homepage": "https://github.com/eosnetworkfoundation/telegram-bot",
+  "author": {
+    "name": "EOS Network Foundation Automation",
+    "email": "zach.butler+telegram-bot@eosnetwork.com",
+    "url": "https://eosnetwork.com"
+  },
+  "license": "MIT",
+  "private": true,
+  "files": [
+    "handler.js"
+  ]
+}

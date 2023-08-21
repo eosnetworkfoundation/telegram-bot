@@ -12,6 +12,10 @@
   },
   "license": "MIT",
   "private": true,
+  "scripts": {
+    "lint": "eslint .",
+    "test": "jest --coverage"
+  },
   "files": [
     "handler.js"
   ],

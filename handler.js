@@ -23,7 +23,12 @@ module.exports.hello = async (event) => {
         console.log(`Found ${chatId.length} char TELEGRAM_CHAT_ID "${chatId.slice(0, 2)}...${chatId.slice(-4)}" in the environment.`);
     }
     // message contents
-    const message = 'Test message from JavaScript.';
+    let message;
+    try {
+        message = event.Records[0].Sns.Message;
+    } catch (error) {
+        message = 'ERROR: Failed to parse message from SNS!\nPlease contact the ENF Automation team if you see this message.';
+    }
     // send message to Telegram
     console.log('Sending message to Telegram...');
     const response = await tgAPI.get(route, {

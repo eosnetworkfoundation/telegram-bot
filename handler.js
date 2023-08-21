@@ -1,12 +1,13 @@
 const axios = require('axios');
 
 const tgAPI = axios.create({
-    baseURL: 'https://api.telegram.org/bot',
+    baseURL: 'https://api.telegram.org',
 });
 
 module.exports.hello = async (event) => {
     const tgKey = process.env.TELEGRAM_API_KEY;
     const chatId = process.env.TELEGRAM_CHAT_ID;
+    const route = `/bot${tgKey}/sendMessage`;
 
     return {
         statusCode: 200,

@@ -3,7 +3,7 @@ const is = require('./is.js');
 
 /* test fixtures */
 const ARRAY = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55];
-const BIGINT = BigInt(81129638414606663681390495662081);
+const BIGINT = BigInt(81129638414606663681390495662081); // eslint-disable-line no-undef
 const BINARY = 0b00101010;
 const FALSE = false;
 const HEX = 0x5a7F0FB9a909a5b3e9B1CEf540bc53F8DE18D87e;

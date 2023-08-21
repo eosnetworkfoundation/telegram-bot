@@ -40,7 +40,8 @@
       "indent": [
         "error",
         4
-      ]
+      ],
+      "object-curly-spacing": "off"
     }
   },
   "jest": {

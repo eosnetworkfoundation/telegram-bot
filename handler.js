@@ -13,8 +13,13 @@ module.exports.hello = async (event) => {
     } else {
         console.log(`Found ${tgKey.length} char TELEGRAM_API_KEY in the environment.`);
     }
-
+    // telegram chat ID
     const chatId = process.env.TELEGRAM_CHAT_ID;
+    if (is.nullOrEmpty(chatId)) {
+        throw new Error('Fatal: TELEGRAM_CHAT_ID is not defined in the environment!');
+    } else {
+        console.log(`Found ${chatId.length} char TELEGRAM_CHAT_ID "${chatId.slice(0, 2)}...${chatId.slice(-4)}" in the environment.`);
+    }
     const route = `/bot${tgKey}/sendMessage`;
 
     const message = 'Test message from JavaScript.';

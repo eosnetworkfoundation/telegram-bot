@@ -17,7 +17,8 @@
     "test": "jest --coverage"
   },
   "files": [
-    "handler.js"
+    "handler.js",
+    "is.js"
   ],
   "dependencies": {
     "axios": "^1.4.0"

@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const api = axios.create({
+const tgAPI = axios.create({
     baseURL: 'https://api.telegram.org/bot',
 });
 

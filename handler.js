@@ -10,6 +10,8 @@ module.exports.hello = async (event) => {
     const tgKey = process.env.TELEGRAM_API_KEY;
     if (is.nullOrEmpty(tgKey)) {
         throw new Error('Fatal: TELEGRAM_API_KEY is not defined in the environment!');
+    } else {
+        console.log(`Found ${tgKey.length} char TELEGRAM_API_KEY in the environment.`);
     }
 
     const chatId = process.env.TELEGRAM_CHAT_ID;

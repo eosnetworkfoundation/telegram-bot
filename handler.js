@@ -30,6 +30,6 @@ module.exports.hello = async (event) => {
 
     return {
         statusCode: 200,
-        body: JSON.stringify(result).replace(tgKey, '${TELEGRAM_API_KEY}').replace(chatId, '${TELEGRAM_CHAT_ID}'),
+        body: JSON.stringify(result).replace(tgKey, '${TELEGRAM_API_KEY}').replace(chatId, '${TELEGRAM_CHAT_ID}'), // eslint-disable-line no-template-curly-in-string
     };
 };

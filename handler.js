@@ -32,7 +32,7 @@ module.exports.hello = async (event) => {
         },
     });
     // construct useful data to return
-    const result = {
+    const rawResult = {
         input: event,
         message,
         output: {
@@ -41,9 +41,12 @@ module.exports.hello = async (event) => {
             status: response.status || null,
         },
     };
-    // sanitize and return useful information
+    // sanitize result
+    const result = JSON.stringify(rawResult).replace(tgKey, '${TELEGRAM_API_KEY}').replace(chatId, '${TELEGRAM_CHAT_ID}'); // eslint-disable-line no-template-curly-in-string
+    console.log('Done.', result);
+    // return useful information
     return {
         statusCode: 200,
-        body: JSON.stringify(result).replace(tgKey, '${TELEGRAM_API_KEY}').replace(chatId, '${TELEGRAM_CHAT_ID}'), // eslint-disable-line no-template-curly-in-string
+        body: result,
     };
 };

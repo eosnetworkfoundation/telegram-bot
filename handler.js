@@ -42,7 +42,7 @@ module.exports.hello = async (event) => {
         },
     };
     // sanitize result
-    const result = JSON.stringify(rawResult).replace(tgKey, '${TELEGRAM_API_KEY}').replace(chatId, '${TELEGRAM_CHAT_ID}'); // eslint-disable-line no-template-curly-in-string
+    const result = JSON.stringify(rawResult, null, 4).replace(tgKey, '${TELEGRAM_API_KEY}').replace(chatId, '${TELEGRAM_CHAT_ID}'); // eslint-disable-line no-template-curly-in-string
     console.log('Done.', result);
     // return useful information
     return {

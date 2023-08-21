@@ -1,11 +1,17 @@
 const axios = require('axios');
+const is = require('./is.js');
 
 const tgAPI = axios.create({
     baseURL: 'https://api.telegram.org',
 });
 
 module.exports.hello = async (event) => {
+    // telegram bot API key
     const tgKey = process.env.TELEGRAM_API_KEY;
+    if (is.nullOrEmpty(tgKey)) {
+        throw new Error('Fatal: TELEGRAM_API_KEY is not defined in the environment!');
+    }
+
     const chatId = process.env.TELEGRAM_CHAT_ID;
     const route = `/bot${tgKey}/sendMessage`;
 

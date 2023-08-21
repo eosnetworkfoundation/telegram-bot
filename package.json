@@ -41,6 +41,7 @@
         "error",
         4
       ],
+      "max-len": "off",
       "object-curly-spacing": "off"
     }
   },

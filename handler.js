@@ -6,6 +6,7 @@ const tgAPI = axios.create({
 });
 
 module.exports.hello = async (event) => {
+    console.log('Received event:', JSON.stringify(event, null, 4));
     // telegram bot API key
     const tgKey = process.env.TELEGRAM_API_KEY;
     if (is.nullOrEmpty(tgKey)) {

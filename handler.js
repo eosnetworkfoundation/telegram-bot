@@ -1,5 +1,9 @@
 const axios = require('axios');
 
+const api = axios.create({
+    baseURL: 'https://api.telegram.org/bot',
+});
+
 module.exports.hello = async (event) => ({
     statusCode: 200,
     body: JSON.stringify(

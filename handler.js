@@ -25,12 +25,14 @@ module.exports.hello = async (event) => {
     // message contents
     const message = 'Test message from JavaScript.';
     // send message to Telegram
+    console.log('Sending message to Telegram...');
     const response = await tgAPI.get(route, {
         params: {
             chat_id: chatId,
             text: message,
         },
     });
+    console.log('Telegram message sent.');
     // construct useful data to return
     const rawResult = {
         input: event,

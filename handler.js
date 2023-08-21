@@ -9,6 +9,15 @@ module.exports.hello = async (event) => {
     const chatId = process.env.TELEGRAM_CHAT_ID;
     const route = `/bot${tgKey}/sendMessage`;
 
+    const message = 'Test message from JavaScript.';
+
+    const response = await tgAPI.get(route, {
+        params: {
+            chat_id: chatId,
+            text: message,
+        },
+    });
+
     return {
         statusCode: 200,
         body: JSON.stringify(

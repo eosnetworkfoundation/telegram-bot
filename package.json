@@ -36,6 +36,7 @@
     },
     "extends": "airbnb-base",
     "rules": {
+      "arrow-parens": "off",
       "import/extensions": "off",
       "indent": [
         "error",

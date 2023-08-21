@@ -6,6 +6,7 @@ const tgAPI = axios.create({
 
 module.exports.hello = async (event) => {
     const tgKey = process.env.TELEGRAM_API_KEY;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
 
     return {
         statusCode: 200,

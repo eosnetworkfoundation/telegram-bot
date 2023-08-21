@@ -5,6 +5,8 @@ const tgAPI = axios.create({
 });
 
 module.exports.hello = async (event) => {
+    const tgKey = process.env.TELEGRAM_API_KEY;
+
     return {
         statusCode: 200,
         body: JSON.stringify(

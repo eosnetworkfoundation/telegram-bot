@@ -18,15 +18,18 @@ module.exports.hello = async (event) => {
         },
     });
 
+    const result = {
+        input: event,
+        message,
+        output: {
+            data: response.data || null,
+            error: response.error || null,
+            status: response.status || null,
+        },
+    };
+
     return {
         statusCode: 200,
-        body: JSON.stringify(
-            {
-                message: 'Go Serverless v1.0! Your function executed successfully!',
-                input: event,
-            },
-            null,
-            2,
-        ),
+        body: JSON.stringify(result),
     };
 };

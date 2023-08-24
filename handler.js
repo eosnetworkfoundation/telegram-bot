@@ -30,8 +30,10 @@ module.exports.hello = async (event) => {
     let message;
     try {
         message = event.Records[0].Sns.Message;
+        console.log('Parsed SNS message.');
     } catch (error) {
         message = 'ERROR: Failed to parse message from SNS!\nPlease contact the ENF Automation team if you see this message.';
+        console.error(message, error);
     }
     // send message to Telegram
     console.log('Sending message to Telegram...');

@@ -10,7 +10,9 @@ module.exports.hello = async (event) => {
     // telegram bot API key
     const tgKey = process.env.TELEGRAM_API_KEY;
     if (is.nullOrEmpty(tgKey)) {
-        throw new Error('Fatal: TELEGRAM_API_KEY is not defined in the environment!');
+        const errMsg = 'Fatal: TELEGRAM_API_KEY is not defined in the environment!';
+        console.error(errMsg);
+        throw new Error(errMsg);
     } else {
         console.log(`Found ${tgKey.length} char TELEGRAM_API_KEY in the environment.`);
     }
@@ -18,7 +20,9 @@ module.exports.hello = async (event) => {
     // telegram chat ID
     const chatId = process.env.TELEGRAM_CHAT_ID;
     if (is.nullOrEmpty(chatId)) {
-        throw new Error('Fatal: TELEGRAM_CHAT_ID is not defined in the environment!');
+        const errMsg = 'Fatal: TELEGRAM_CHAT_ID is not defined in the environment!';
+        console.error(errMsg);
+        throw new Error(errMsg);
     } else {
         console.log(`Found ${chatId.length} char TELEGRAM_CHAT_ID "${chatId.slice(0, 2)}...${chatId.slice(-4)}" in the environment.`);
     }

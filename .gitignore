@@ -1,5 +1,6 @@
 # archives
 *.7z
+*.bak
 *.rar
 *.tar
 *.tar.gz

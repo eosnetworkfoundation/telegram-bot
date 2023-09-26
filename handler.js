@@ -93,14 +93,11 @@ module.exports.entrypoint = async (event) => {
 
 module.exports.hello = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
-    // telegram bot API key
-    this.tgKey = readEnv('TELEGRAM_API_KEY');
-    // telegram chat ID for customer notifications
-    const chatIdProd = readEnv('TELEGRAM_CHAT_ID', true);
-    // telegram chat ID for maintainer notifications
-    const chatIdDev = readEnv('TELEGRAM_CHAT_ID_DEV', true, chatIdProd);
-    // maintainer name or contact info
-    const maintainer = readEnv('MAINTAINER', true, 'the bot maintainer');
+    // read environment variables
+    this.tgKey = readEnv('TELEGRAM_API_KEY'); // telegram bot API key
+    const chatIdProd = readEnv('TELEGRAM_CHAT_ID', true); // telegram chat ID for customer notifications
+    const chatIdDev = readEnv('TELEGRAM_CHAT_ID_DEV', true, chatIdProd); // telegram chat ID for maintainer notifications
+    const maintainer = readEnv('MAINTAINER', true, 'the bot maintainer'); // maintainer name or contact info
     // message contents
     let message;
     try {

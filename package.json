@@ -38,6 +38,7 @@
     "extends": "airbnb-base",
     "rules": {
       "arrow-parens": "off",
+      "default-param-last": "off",
       "import/extensions": "off",
       "indent": [
         "error",

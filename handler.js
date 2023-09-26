@@ -44,6 +44,12 @@ const pushTelegramMsg = async (message, chatId) => {
     return response;
 };
 
+// send an error message to Telegram
+const pushTelegramMsgErr = (err) => {
+    const msg = `❗ - ${process.env.AWS_LAMBDA_FUNCTION_NAME} - ❗\n${err.fileName}:${err.lineNumber}:${err.columnNumber}\n**${err.name}:** ${err.message}\`\`\`\n${err.stack}\`\`\``;
+    return pushTelegramMsg(msg, this.chatIdErr);
+};
+
 // try loading an environment variable, optionally showing part of the value or falling back to a default
 const readEnv = (key, hint = false, dflt) => {
     const value = process.env[key];

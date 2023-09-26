@@ -33,7 +33,7 @@ const envRead = (key, hint = false, dflt) => {
         console.log(`No ${key} found in the environment, using default value ("${dflt.slice(0, 2)}...${dflt.slice(-4)}").`);
         return dflt;
     } else if (hint) {
-        console.log(`Found ${value.length} char ${key} "${value.slice(0, 2)}...${value.slice(-4)}" in the environment.`);
+        console.log(`Found ${value.length} char ${key} ("${value.slice(0, 2)}...${value.slice(-4)}") in the environment.`);
     } else {
         console.log(`Found ${value.length} char ${key} in the environment.`);
     }

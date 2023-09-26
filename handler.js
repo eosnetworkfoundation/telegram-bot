@@ -29,8 +29,10 @@ module.exports.hello = async (event) => {
     // telegram bot API key
     const tgKey = loadEnv('TELEGRAM_API_KEY');
     const route = `/bot${tgKey}/sendMessage`;
-    // telegram chat ID
+    // telegram chat ID for customer notifications
     const chatId = loadEnv('TELEGRAM_CHAT_ID', true);
+    // telegram chat ID for maintainer notifications
+    const chatIdDev = loadEnv('TELEGRAM_CHAT_ID_DEV', true, chatId);
     // message contents
     let message;
     try {

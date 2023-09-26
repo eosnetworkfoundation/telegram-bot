@@ -23,6 +23,7 @@ const loadEnv = (key, hint = false, dflt) => {
     return value;
 };
 
+// entrypoint
 module.exports.hello = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
     // telegram bot API key

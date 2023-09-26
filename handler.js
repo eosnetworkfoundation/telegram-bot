@@ -74,7 +74,7 @@ module.exports.hello = async (event) => {
         console.error(message, error);
     }
     // send message to Telegram
-    const response = sendTelegramMsg(message, chatId);
+    const response = await sendTelegramMsg(message, chatId);
     // construct useful data to return
     const rawResult = {
         input: event,

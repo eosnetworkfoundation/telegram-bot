@@ -2,39 +2,68 @@ const axios = require('axios');
 const is = require('./is.js');
 
 /* globals */
-// telegram chat ID for error messages
-let _chatIdErr;
-Object.defineProperty(this, 'chatIdErr', {
-    get: () => _chatIdErr || process.env.TELEGRAM_CHAT_ID_ERR,
-    set: (id) => {
-        _chatIdErr = id;
-    },
-});
-
-// init Telegram API
-const tgAPI = axios.create({
-    baseURL: 'https://api.telegram.org',
-});
+const accessEnv = (key, secret = true) => {
+    const value = process.env[key];
+    if (is.nullOrEmpty(value)) {
+        console.warn(`WARNING: ${key} is not defined in the environment!`);
+    } else {
+        console.log(`Read ${value.length} char ${key}${secret ? '' : ` ("${value.slice(0, 2)}...${value.slice(-4)}")`} from the environment.`);
+    }
+    return value;
+};
 
 // telegram API key
-let _tgKey;
-Object.defineProperty(this, 'tgKey', {
-    get: () => _tgKey,
-    set: (k) => {
-        _tgKey = k;
+let _api;
+let _apiKey;
+Object.defineProperty(this, 'api', {
+    get: () => {
+        if (is.nullOrEmpty(_api)) {
+            _apiKey = accessEnv('TELEGRAM_API_KEY', true);
+            if (is.nullOrEmpty(_apiKey)) {
+                throw new Error('TELEGRAM_API_KEY is not defined in the environment!');
+            }
+            _api = axios.create({
+                baseURL: `https://api.telegram.org/bot${_apiKey}/sendMessage`,
+            });
+        }
+        return _api;
     },
 });
 
-// telegram API route
-Object.defineProperty(this, 'tgRoute', {
-    get: () => `/bot${_tgKey}/sendMessage`,
+// telegram chat ID for customer notifications
+let _chatIdCustomer;
+Object.defineProperty(this, 'chatIdCustomer', {
+    get: () => {
+        if (is.nullOrEmpty(_chatIdCustomer)) {
+            _chatIdCustomer = accessEnv('TELEGRAM_CHAT_ID', false);
+            if (is.nullOrEmpty(_chatIdCustomer)) {
+                throw new Error('TELEGRAM_CHAT_ID is not defined in the environment!');
+            }
+        }
+        return _chatIdCustomer;
+    },
+});
+
+// telegram chat ID for test notifications
+Object.defineProperty(this, 'chatIdDev', {
+    get: () => accessEnv('TELEGRAM_CHAT_ID_DEV', false),
+});
+
+// telegram chat ID for alerts to the bot owner/maintainer
+Object.defineProperty(this, 'chatIdOwner', {
+    get: () => accessEnv('TELEGRAM_CHAT_ID_OWNER', false),
+});
+
+// name or contact info for the bot maintainer
+Object.defineProperty(this, 'maintainer', {
+    get: () => accessEnv('MAINTAINER'),
 });
 
 /* functions */
 // send a Telegram message
-const pushTelegramMsg = async (message, chatId) => {
+const pushTelegramMsg = async (message, chatId = this.chatId) => {
     console.log('Sending message to Telegram...');
-    const response = await tgAPI.get(this.tgRoute, {
+    const response = await this.api.get('', {
         params: {
             chat_id: chatId,
             text: message,
@@ -47,28 +76,12 @@ const pushTelegramMsg = async (message, chatId) => {
 // send an error message to Telegram
 const pushTelegramMsgErr = (err) => {
     try {
-        const msg = `❗ - ${process.env.AWS_LAMBDA_FUNCTION_NAME} - ❗\n${err.fileName}:${err.lineNumber}:${err.columnNumber}\n**${err.name}:** ${err.message}\`\`\`\n${err.stack}\`\`\``;
-        return pushTelegramMsg(msg, this.chatIdErr);
+        const msg = `❗ - ${process.env.AWS_LAMBDA_FUNCTION_NAME} - ❗\n${err.fileName}:${err.lineNumber}:${err.columnNumber}\n**${err.name}:** ${err.message}\`\`\`\n${err.stack}\`\`\`\nPlease contact ${this.maintainer} if you see this message.`;
+        return pushTelegramMsg(msg, this.chatIdOwner);
     } catch (error) {
         console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', error);
         return Promise.resolve();
     }
-};
-
-// try loading an environment variable, optionally showing part of the value or falling back to a default
-const readEnv = (key, hint = false, dflt) => {
-    const value = process.env[key];
-    if (is.nullOrEmpty(value) && is.nullOrEmpty(dflt)) {
-        throw new Error(`${key} is not defined in the environment!`);
-    } else if (is.nullOrEmpty(value) && hint) {
-        console.log(`No ${key} found in the environment, using default value ("${dflt.slice(0, 2)}...${dflt.slice(-4)}").`);
-        return dflt;
-    } else if (hint) {
-        console.log(`Found ${value.length} char ${key} ("${value.slice(0, 2)}...${value.slice(-4)}") in the environment.`);
-    } else {
-        console.log(`Found ${value.length} char ${key} in the environment.`);
-    }
-    return value;
 };
 
 /* entrypoint */
@@ -90,11 +103,6 @@ module.exports.entrypoint = async (event) => {
 
 module.exports.hello = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
-    // read environment variables
-    this.tgKey = readEnv('TELEGRAM_API_KEY'); // telegram bot API key
-    const chatIdProd = readEnv('TELEGRAM_CHAT_ID', true); // telegram chat ID for customer notifications
-    const chatIdDev = readEnv('TELEGRAM_CHAT_ID_DEV', true, chatIdProd); // telegram chat ID for maintainer notifications
-    const maintainer = readEnv('MAINTAINER', true, 'the bot maintainer'); // maintainer name or contact info
     // message contents
     let message;
     try {
@@ -105,7 +113,7 @@ module.exports.hello = async (event) => {
         throw error;
     }
     // send message to Telegram
-    const response = await pushTelegramMsg(message, chatIdProd);
+    const response = await pushTelegramMsg(message, this.chatIdCustomer);
     // construct useful data to return
     const rawResult = {
         input: event,
@@ -118,8 +126,8 @@ module.exports.hello = async (event) => {
     };
     // sanitize result
     const result = JSON.stringify(rawResult, null, 4)
-        .replace(new RegExp(this.tgKey, 'g'), '${TELEGRAM_API_KEY}') // eslint-disable-line no-template-curly-in-string
-        .replace(new RegExp(chatIdProd, 'g'), '${TELEGRAM_CHAT_ID}'); // eslint-disable-line no-template-curly-in-string
+        .replace(new RegExp(_apiKey, 'g'), '${TELEGRAM_API_KEY}') // eslint-disable-line no-template-curly-in-string
+        .replace(new RegExp(this.chatIdCustomer, 'g'), '${TELEGRAM_CHAT_ID}'); // eslint-disable-line no-template-curly-in-string
     console.log('Done.', result);
     // return useful information
     return result;

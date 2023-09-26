@@ -45,6 +45,7 @@
         4
       ],
       "max-len": "off",
+      "no-console": "off",
       "object-curly-spacing": "off"
     }
   },

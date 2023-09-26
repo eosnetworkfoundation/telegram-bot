@@ -2,6 +2,15 @@ const axios = require('axios');
 const is = require('./is.js');
 
 /* globals */
+// telegram chat ID for error messages
+let _chatIdErr;
+Object.defineProperty(this, 'chatIdErr', {
+    get: () => _chatIdErr || process.env.TELEGRAM_CHAT_ID_ERR,
+    set: (id) => {
+        _chatIdErr = id;
+    },
+});
+
 // init Telegram API
 const tgAPI = axios.create({
     baseURL: 'https://api.telegram.org',
@@ -22,6 +31,19 @@ Object.defineProperty(this, 'tgRoute', {
 });
 
 /* functions */
+// send a Telegram message
+const pushTelegramMsg = async (message, chatId) => {
+    console.log('Sending message to Telegram...');
+    const response = await tgAPI.get(this.tgRoute, {
+        params: {
+            chat_id: chatId,
+            text: message,
+        },
+    });
+    console.log('Telegram message sent.');
+    return response;
+};
+
 // try loading an environment variable, optionally showing part of the value or falling back to a default
 const readEnv = (key, hint = false, dflt) => {
     const value = process.env[key];
@@ -38,19 +60,6 @@ const readEnv = (key, hint = false, dflt) => {
         console.log(`Found ${value.length} char ${key} in the environment.`);
     }
     return value;
-};
-
-// send a Telegram message
-const sendTelegramMsg = async (message, chatId) => {
-    console.log('Sending message to Telegram...');
-    const response = await tgAPI.get(this.tgRoute, {
-        params: {
-            chat_id: chatId,
-            text: message,
-        },
-    });
-    console.log('Telegram message sent.');
-    return response;
 };
 
 /* entrypoint */
@@ -72,10 +81,10 @@ module.exports.hello = async (event) => {
     } catch (error) {
         message = `ERROR: Failed to parse message from SNS!\nPlease contact ${maintainer} if you see this message.`;
         console.error(message, error);
-        sendTelegramMsg(message, chatIdDev);
+        pushTelegramMsg(message, chatIdDev);
     }
     // send message to Telegram
-    const response = await sendTelegramMsg(message, chatIdProd);
+    const response = await pushTelegramMsg(message, chatIdProd);
     // construct useful data to return
     const rawResult = {
         input: event,

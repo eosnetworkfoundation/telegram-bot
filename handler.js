@@ -33,13 +33,15 @@ module.exports.hello = async (event) => {
     const chatId = loadEnv('TELEGRAM_CHAT_ID', true);
     // telegram chat ID for maintainer notifications
     const chatIdDev = loadEnv('TELEGRAM_CHAT_ID_DEV', true, chatId);
+    // maintainer name or contact info
+    const maintainer = loadEnv('MAINTAINER', true, 'the bot maintainer');
     // message contents
     let message;
     try {
         message = event.Records[0].Sns.Message;
         console.log('Parsed SNS message.');
     } catch (error) {
-        message = 'ERROR: Failed to parse message from SNS!\nPlease contact the ENF Automation team if you see this message.';
+        message = `ERROR: Failed to parse message from SNS!\nPlease contact ${maintainer} if you see this message.`;
         console.error(message, error);
     }
     // send message to Telegram

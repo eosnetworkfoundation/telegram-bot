@@ -1,6 +1,7 @@
 const axios = require('axios');
 const is = require('./is.js');
 
+// init Telegram API
 const tgAPI = axios.create({
     baseURL: 'https://api.telegram.org',
 });

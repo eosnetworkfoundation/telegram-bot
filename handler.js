@@ -60,8 +60,9 @@ const readEnv = (key, hint = false, dflt) => {
     const value = process.env[key];
     if (is.nullOrEmpty(value) && is.nullOrEmpty(dflt)) {
         const errMsg = `FATAL: ${key} is not defined in the environment!`;
-        console.error(errMsg);
-        throw new Error(errMsg);
+        const err = new Error(errMsg);
+        console.error(errMsg, err);
+        throw err;
     } else if (is.nullOrEmpty(value) && hint) {
         console.log(`No ${key} found in the environment, using default value ("${dflt.slice(0, 2)}...${dflt.slice(-4)}").`);
         return dflt;

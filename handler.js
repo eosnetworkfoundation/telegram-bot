@@ -59,9 +59,9 @@ module.exports.hello = async (event) => {
     // telegram bot API key
     this.tgKey = envRead('TELEGRAM_API_KEY');
     // telegram chat ID for customer notifications
-    const chatId = envRead('TELEGRAM_CHAT_ID', true);
+    const chatIdProd = envRead('TELEGRAM_CHAT_ID', true);
     // telegram chat ID for maintainer notifications
-    const chatIdDev = envRead('TELEGRAM_CHAT_ID_DEV', true, chatId);
+    const chatIdDev = envRead('TELEGRAM_CHAT_ID_DEV', true, chatIdProd);
     // maintainer name or contact info
     const maintainer = envRead('MAINTAINER', true, 'the bot maintainer');
     // message contents
@@ -74,7 +74,7 @@ module.exports.hello = async (event) => {
         console.error(message, error);
     }
     // send message to Telegram
-    const response = await sendTelegramMsg(message, chatId);
+    const response = await sendTelegramMsg(message, chatIdProd);
     // construct useful data to return
     const rawResult = {
         input: event,
@@ -88,7 +88,7 @@ module.exports.hello = async (event) => {
     // sanitize result
     const result = JSON.stringify(rawResult, null, 4)
         .replace(new RegExp(this.tgKey, 'g'), '${TELEGRAM_API_KEY}') // eslint-disable-line no-template-curly-in-string
-        .replace(new RegExp(chatId, 'g'), '${TELEGRAM_CHAT_ID}'); // eslint-disable-line no-template-curly-in-string
+        .replace(new RegExp(chatIdProd, 'g'), '${TELEGRAM_CHAT_ID}'); // eslint-disable-line no-template-curly-in-string
     console.log('Done.', result);
     // return useful information
     return {

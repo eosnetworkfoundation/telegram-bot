@@ -5,27 +5,31 @@ const tgAPI = axios.create({
     baseURL: 'https://api.telegram.org',
 });
 
+// try loading an environment variable, optionally showing part of the value or falling back to a default
+const loadEnv = (key, hint = false, dflt) => {
+    const value = process.env[key];
+    if (is.nullOrEmpty(value) && is.nullOrEmpty(dflt)) {
+        const errMsg = `FATAL: ${key} is not defined in the environment!`;
+        console.error(errMsg);
+        throw new Error(errMsg);
+    } else if (is.nullOrEmpty(value) && hint) {
+        console.log(`No ${key} found in the environment, using default value ("${dflt.slice(0, 2)}...${dflt.slice(-4)}").`);
+        return dflt;
+    } else if (hint) {
+        console.log(`Found ${value.length} char ${key} "${value.slice(0, 2)}...${value.slice(-4)}" in the environment.`);
+    } else {
+        console.log(`Found ${value.length} char ${key} in the environment.`);
+    }
+    return value;
+};
+
 module.exports.hello = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
     // telegram bot API key
-    const tgKey = process.env.TELEGRAM_API_KEY;
-    if (is.nullOrEmpty(tgKey)) {
-        const errMsg = 'Fatal: TELEGRAM_API_KEY is not defined in the environment!';
-        console.error(errMsg);
-        throw new Error(errMsg);
-    } else {
-        console.log(`Found ${tgKey.length} char TELEGRAM_API_KEY in the environment.`);
-    }
+    const tgKey = loadEnv('TELEGRAM_API_KEY');
     const route = `/bot${tgKey}/sendMessage`;
     // telegram chat ID
-    const chatId = process.env.TELEGRAM_CHAT_ID;
-    if (is.nullOrEmpty(chatId)) {
-        const errMsg = 'Fatal: TELEGRAM_CHAT_ID is not defined in the environment!';
-        console.error(errMsg);
-        throw new Error(errMsg);
-    } else {
-        console.log(`Found ${chatId.length} char TELEGRAM_CHAT_ID "${chatId.slice(0, 2)}...${chatId.slice(-4)}" in the environment.`);
-    }
+    const chatId = loadEnv('TELEGRAM_CHAT_ID', true);
     // message contents
     let message;
     try {

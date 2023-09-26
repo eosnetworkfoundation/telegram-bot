@@ -13,6 +13,13 @@ const accessEnv = (key, secret = true) => {
     return value;
 };
 
+// scrub sensitive data from a string
+const sanitize = (str) => str
+    .replace(new RegExp(_apiKey, 'g'), '${TELEGRAM_API_KEY}') // eslint-disable-line no-template-curly-in-string
+    .replace(new RegExp(this.chatIdCustomer, 'g'), '${TELEGRAM_CHAT_ID}') // eslint-disable-line no-template-curly-in-string
+    .replace(new RegExp(this.chatIdDev, 'g'), '${TELEGRAM_CHAT_ID_DEV}') // eslint-disable-line no-template-curly-in-string
+    .replace(new RegExp(this.chatIdOwner, 'g'), '${TELEGRAM_CHAT_ID_OWNER}'); // eslint-disable-line no-template-curly-in-string
+
 /* globals */
 // telegram API integration
 let _api;
@@ -68,7 +75,7 @@ const pushTelegramMsg = async (message, chatId = this.chatId) => {
     const response = await this.api.get('', {
         params: {
             chat_id: chatId,
-            text: message,
+            text: sanitize(message),
         },
     });
     console.log('Telegram message sent.');
@@ -81,7 +88,7 @@ const pushTelegramMsgErr = (err) => {
         const msg = `❗ - ${process.env.AWS_LAMBDA_FUNCTION_NAME} - ❗\n${err.fileName}:${err.lineNumber}:${err.columnNumber}\n**${err.name}:** ${err.message}\`\`\`\n${err.stack}\`\`\`\nPlease contact ${this.maintainer} if you see this message.`;
         return pushTelegramMsg(msg, this.chatIdOwner);
     } catch (error) {
-        console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', error);
+        console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', sanitize(error.toString())); // we do not propagate this error because there is a higher error we want to alert on
         return Promise.resolve();
     }
 };
@@ -97,7 +104,7 @@ module.exports.entrypoint = async (event) => {
         result.statusCode = 200;
     } catch (error) {
         result.body = error;
-        console.error(`FATAL: ${error.message}`, error);
+        console.error(sanitize(`FATAL: ${error.message}`), sanitize(error.toString()));
         await pushTelegramMsgErr(error);
     }
     return result;
@@ -127,9 +134,7 @@ module.exports.hello = async (event) => {
         },
     };
     // sanitize result
-    const result = JSON.stringify(rawResult, null, 4)
-        .replace(new RegExp(_apiKey, 'g'), '${TELEGRAM_API_KEY}') // eslint-disable-line no-template-curly-in-string
-        .replace(new RegExp(this.chatIdCustomer, 'g'), '${TELEGRAM_CHAT_ID}'); // eslint-disable-line no-template-curly-in-string
+    const result = sanitize(JSON.stringify(rawResult, null, 4));
     console.log('Done.', result);
     // return useful information
     return result;

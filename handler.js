@@ -12,7 +12,7 @@ Object.defineProperty(this, 'tgKey', {
     get: () => _tgKey,
     set: (k) => {
         _tgKey = k;
-    }
+    },
 });
 
 // telegram API route

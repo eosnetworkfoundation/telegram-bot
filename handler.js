@@ -59,10 +59,7 @@ const pushTelegramMsgErr = (err) => {
 const readEnv = (key, hint = false, dflt) => {
     const value = process.env[key];
     if (is.nullOrEmpty(value) && is.nullOrEmpty(dflt)) {
-        const errMsg = `FATAL: ${key} is not defined in the environment!`;
-        const err = new Error(errMsg);
-        console.error(errMsg, err);
-        throw err;
+        throw new Error(`${key} is not defined in the environment!`);
     } else if (is.nullOrEmpty(value) && hint) {
         console.log(`No ${key} found in the environment, using default value ("${dflt.slice(0, 2)}...${dflt.slice(-4)}").`);
         return dflt;
@@ -85,7 +82,7 @@ module.exports.entrypoint = async (event) => {
         result.statusCode = 200;
     } catch (error) {
         result.body = error;
-        console.error(`FATAL: ${error.name} - ${error.message}`, error);
+        console.error(`FATAL: ${error.message}`, error);
         await pushTelegramMsgErr(error);
     }
     return result;
@@ -104,9 +101,8 @@ module.exports.hello = async (event) => {
         message = event.Records[0].Sns.Message;
         console.log('Parsed SNS message.');
     } catch (error) {
-        message = `ERROR: Failed to parse message from SNS!\nPlease contact ${maintainer} if you see this message.`;
-        console.error(message, error);
-        pushTelegramMsg(message, chatIdDev);
+        error.message = `Failed to parse message from SNS!\n${error.message}`;
+        throw error;
     }
     // send message to Telegram
     const response = await pushTelegramMsg(message, chatIdProd);

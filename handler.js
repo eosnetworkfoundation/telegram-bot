@@ -15,6 +15,11 @@ Object.defineProperty(this, 'tgKey', {
     }
 });
 
+// telegram API route
+Object.defineProperty(this, 'tgRoute', {
+    get: () => `/bot${_tgKey}/sendMessage`,
+});
+
 // try loading an environment variable, optionally showing part of the value or falling back to a default
 const loadEnv = (key, hint = false, dflt) => {
     const value = process.env[key];
@@ -38,7 +43,6 @@ module.exports.hello = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
     // telegram bot API key
     this.tgKey = loadEnv('TELEGRAM_API_KEY');
-    const route = `/bot${this.tgKey}/sendMessage`;
     // telegram chat ID for customer notifications
     const chatId = loadEnv('TELEGRAM_CHAT_ID', true);
     // telegram chat ID for maintainer notifications
@@ -56,7 +60,7 @@ module.exports.hello = async (event) => {
     }
     // send message to Telegram
     console.log('Sending message to Telegram...');
-    const response = await tgAPI.get(route, {
+    const response = await tgAPI.get(this.tgRoute, {
         params: {
             chat_id: chatId,
             text: message,

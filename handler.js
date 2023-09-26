@@ -46,8 +46,13 @@ const pushTelegramMsg = async (message, chatId) => {
 
 // send an error message to Telegram
 const pushTelegramMsgErr = (err) => {
-    const msg = `❗ - ${process.env.AWS_LAMBDA_FUNCTION_NAME} - ❗\n${err.fileName}:${err.lineNumber}:${err.columnNumber}\n**${err.name}:** ${err.message}\`\`\`\n${err.stack}\`\`\``;
-    return pushTelegramMsg(msg, this.chatIdErr);
+    try {
+        const msg = `❗ - ${process.env.AWS_LAMBDA_FUNCTION_NAME} - ❗\n${err.fileName}:${err.lineNumber}:${err.columnNumber}\n**${err.name}:** ${err.message}\`\`\`\n${err.stack}\`\`\``;
+        return pushTelegramMsg(msg, this.chatIdErr);
+    } catch (error) {
+        console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', error);
+        return Promise.resolve();
+    }
 };
 
 // try loading an environment variable, optionally showing part of the value or falling back to a default

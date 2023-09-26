@@ -15,10 +15,12 @@ const accessEnv = (key, secret = true) => {
 
 // scrub sensitive data from a string
 const sanitize = (str) => str
-    .replace(new RegExp(_apiKey, 'g'), '${TELEGRAM_API_KEY}') // eslint-disable-line no-template-curly-in-string
-    .replace(new RegExp(this.chatIdCustomer, 'g'), '${TELEGRAM_CHAT_ID}') // eslint-disable-line no-template-curly-in-string
-    .replace(new RegExp(this.chatIdDev, 'g'), '${TELEGRAM_CHAT_ID_DEV}') // eslint-disable-line no-template-curly-in-string
-    .replace(new RegExp(this.chatIdOwner, 'g'), '${TELEGRAM_CHAT_ID_OWNER}'); // eslint-disable-line no-template-curly-in-string
+    /* eslint-disable no-template-curly-in-string */
+    .replace(new RegExp(_apiKey, 'g'), '${TELEGRAM_API_KEY}')
+    .replace(new RegExp(this.chatIdCustomer, 'g'), '${TELEGRAM_CHAT_ID}')
+    .replace(new RegExp(this.chatIdDev, 'g'), '${TELEGRAM_CHAT_ID_DEV}')
+    .replace(new RegExp(this.chatIdOwner, 'g'), '${TELEGRAM_CHAT_ID_OWNER}');
+    /* eslint-enable no-template-curly-in-string */
 
 /* globals */
 // telegram API integration

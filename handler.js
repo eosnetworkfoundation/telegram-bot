@@ -6,6 +6,15 @@ const tgAPI = axios.create({
     baseURL: 'https://api.telegram.org',
 });
 
+// telegram API key
+let _tgKey;
+Object.defineProperty(this, 'tgKey', {
+    get: () => _tgKey,
+    set: (k) => {
+        _tgKey = k;
+    }
+});
+
 // try loading an environment variable, optionally showing part of the value or falling back to a default
 const loadEnv = (key, hint = false, dflt) => {
     const value = process.env[key];
@@ -28,8 +37,8 @@ const loadEnv = (key, hint = false, dflt) => {
 module.exports.hello = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
     // telegram bot API key
-    const tgKey = loadEnv('TELEGRAM_API_KEY');
-    const route = `/bot${tgKey}/sendMessage`;
+    this.tgKey = loadEnv('TELEGRAM_API_KEY');
+    const route = `/bot${this.tgKey}/sendMessage`;
     // telegram chat ID for customer notifications
     const chatId = loadEnv('TELEGRAM_CHAT_ID', true);
     // telegram chat ID for maintainer notifications
@@ -66,7 +75,7 @@ module.exports.hello = async (event) => {
     };
     // sanitize result
     const result = JSON.stringify(rawResult, null, 4)
-        .replace(new RegExp(tgKey, 'g'), '${TELEGRAM_API_KEY}') // eslint-disable-line no-template-curly-in-string
+        .replace(new RegExp(this.tgKey, 'g'), '${TELEGRAM_API_KEY}') // eslint-disable-line no-template-curly-in-string
         .replace(new RegExp(chatId, 'g'), '${TELEGRAM_CHAT_ID}'); // eslint-disable-line no-template-curly-in-string
     console.log('Done.', result);
     // return useful information

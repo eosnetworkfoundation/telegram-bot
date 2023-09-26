@@ -38,6 +38,19 @@ const envRead = (key, hint = false, dflt) => {
     return value;
 };
 
+// send a Telegram message
+const sendTelegramMsg = async (message, chatId) => {
+    console.log('Sending message to Telegram...');
+    const response = await tgAPI.get(this.tgRoute, {
+        params: {
+            chat_id: chatId,
+            text: message,
+        },
+    });
+    console.log('Telegram message sent.');
+    return response;
+};
+
 // entrypoint
 module.exports.hello = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
@@ -59,14 +72,7 @@ module.exports.hello = async (event) => {
         console.error(message, error);
     }
     // send message to Telegram
-    console.log('Sending message to Telegram...');
-    const response = await tgAPI.get(this.tgRoute, {
-        params: {
-            chat_id: chatId,
-            text: message,
-        },
-    });
-    console.log('Telegram message sent.');
+    const response = sendTelegramMsg(message, chatId);
     // construct useful data to return
     const rawResult = {
         input: event,

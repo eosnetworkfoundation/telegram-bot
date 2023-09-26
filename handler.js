@@ -1,6 +1,7 @@
 const axios = require('axios');
 const is = require('./is.js');
 
+/* globals */
 // init Telegram API
 const tgAPI = axios.create({
     baseURL: 'https://api.telegram.org',
@@ -20,6 +21,7 @@ Object.defineProperty(this, 'tgRoute', {
     get: () => `/bot${_tgKey}/sendMessage`,
 });
 
+/* functions */
 // try loading an environment variable, optionally showing part of the value or falling back to a default
 const envRead = (key, hint = false, dflt) => {
     const value = process.env[key];
@@ -51,7 +53,7 @@ const sendTelegramMsg = async (message, chatId) => {
     return response;
 };
 
-// entrypoint
+/* entrypoint */
 module.exports.hello = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
     // telegram bot API key

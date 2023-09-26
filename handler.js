@@ -72,6 +72,7 @@ module.exports.hello = async (event) => {
     } catch (error) {
         message = `ERROR: Failed to parse message from SNS!\nPlease contact ${maintainer} if you see this message.`;
         console.error(message, error);
+        sendTelegramMsg(message, chatIdDev);
     }
     // send message to Telegram
     const response = await sendTelegramMsg(message, chatIdProd);

@@ -1,7 +1,8 @@
 const axios = require('axios');
 const is = require('./is.js');
 
-/* globals */
+/* functions */
+// read an environment variable and log the status
 const accessEnv = (key, secret = true) => {
     const value = process.env[key];
     if (is.nullOrEmpty(value)) {
@@ -12,7 +13,8 @@ const accessEnv = (key, secret = true) => {
     return value;
 };
 
-// telegram API key
+/* globals */
+// telegram API integration
 let _api;
 let _apiKey;
 Object.defineProperty(this, 'api', {
@@ -59,7 +61,7 @@ Object.defineProperty(this, 'maintainer', {
     get: () => accessEnv('MAINTAINER'),
 });
 
-/* functions */
+/* telegram */
 // send a Telegram message
 const pushTelegramMsg = async (message, chatId = this.chatId) => {
     console.log('Sending message to Telegram...');

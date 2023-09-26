@@ -23,7 +23,7 @@ Object.defineProperty(this, 'tgRoute', {
 
 /* functions */
 // try loading an environment variable, optionally showing part of the value or falling back to a default
-const envRead = (key, hint = false, dflt) => {
+const readEnv = (key, hint = false, dflt) => {
     const value = process.env[key];
     if (is.nullOrEmpty(value) && is.nullOrEmpty(dflt)) {
         const errMsg = `FATAL: ${key} is not defined in the environment!`;
@@ -57,13 +57,13 @@ const sendTelegramMsg = async (message, chatId) => {
 module.exports.hello = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
     // telegram bot API key
-    this.tgKey = envRead('TELEGRAM_API_KEY');
+    this.tgKey = readEnv('TELEGRAM_API_KEY');
     // telegram chat ID for customer notifications
-    const chatIdProd = envRead('TELEGRAM_CHAT_ID', true);
+    const chatIdProd = readEnv('TELEGRAM_CHAT_ID', true);
     // telegram chat ID for maintainer notifications
-    const chatIdDev = envRead('TELEGRAM_CHAT_ID_DEV', true, chatIdProd);
+    const chatIdDev = readEnv('TELEGRAM_CHAT_ID_DEV', true, chatIdProd);
     // maintainer name or contact info
-    const maintainer = envRead('MAINTAINER', true, 'the bot maintainer');
+    const maintainer = readEnv('MAINTAINER', true, 'the bot maintainer');
     // message contents
     let message;
     try {

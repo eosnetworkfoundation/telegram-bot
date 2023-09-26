@@ -46,6 +46,7 @@
       ],
       "max-len": "off",
       "no-console": "off",
+      "no-use-before-define": "warn",
       "object-curly-spacing": "off"
     }
   },

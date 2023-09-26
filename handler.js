@@ -75,6 +75,22 @@ const readEnv = (key, hint = false, dflt) => {
 };
 
 /* entrypoint */
+module.exports.entrypoint = async (event) => {
+    const result = {
+        statusCode: 500,
+        body: 'FATAL: Unknown error!',
+    };
+    try {
+        result.body = await this.hello(event);
+        result.statusCode = 200;
+    } catch (error) {
+        result.body = error;
+        console.error(`FATAL: ${error.name} - ${error.message}`, error);
+        await pushTelegramMsgErr(error);
+    }
+    return result;
+};
+
 module.exports.hello = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
     // telegram bot API key
@@ -113,8 +129,5 @@ module.exports.hello = async (event) => {
         .replace(new RegExp(chatIdProd, 'g'), '${TELEGRAM_CHAT_ID}'); // eslint-disable-line no-template-curly-in-string
     console.log('Done.', result);
     // return useful information
-    return {
-        statusCode: 200,
-        body: result,
-    };
+    return result;
 };

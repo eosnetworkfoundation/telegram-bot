@@ -3,6 +3,28 @@ const is = require('./is.js');
 const joi = require('joi');
 
 /* joi schema */
+// schema of a CloudWatch alarm state
+const cloudwatchAlarmStateSchema = joi.object({
+    reason: joi.string().required(),
+    timestamp: joi.string().isoDate().required(),
+    value: joi.string().valid('ALARM', 'OK', 'INSUFFICIENT_DATA').required(),
+}).unknown();
+
+// schema of an unpacked CloudWatch alarm state change event
+const cloudwatchEventSchema = joi.object({
+    account: joi.string().pattern(/^[0-9]+$/).required(),
+    detail: joi.object({
+        alarmName: joi.string().required(),
+        configuration: joi.object({
+            description: joi.string().allow(null).required(),
+        }).unknown().required(),
+        previousState: cloudwatchAlarmStateSchema.required(),
+        state: cloudwatchAlarmStateSchema.required(),
+    }).unknown().required(),
+    'detail-type': joi.string().valid('CloudWatch Alarm State Change').required(),
+    source: joi.string().valid('aws.cloudwatch').required(),
+}).unknown();
+
 // schema of a single SNS event "record"
 const snsEventRecordSchema = joi.object({
     EventSource: joi.string().valid('aws:sns').required(),
@@ -160,6 +182,7 @@ module.exports.hello = async (event) => {
     joi.assert(event, snsEventSchema, 'SNS event failed joi schema validation!');
     // parse and validate message contents
     const message = parseSnsMessage(event);
+    joi.assert(message, cloudwatchEventSchema, 'SNS message failed joi schema validation!');
     // send message to Telegram
     const response = await pushTelegramMsg(message, this.chatIdCustomer);
     // construct useful data to return

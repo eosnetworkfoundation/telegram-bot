@@ -4,6 +4,7 @@
 ### Index
 1. [Development](#development)
     1. [Prerequisites](#prerequisites)
+    1. [Initialization](#initialization)
 
 ## Development
 Start here to build this project or to contribute to this repo.
@@ -23,6 +24,17 @@ You will need the following tools:
     npm install --global yarn
     ```
 These tools are all you need to get started!
+
+### Initialization
+Once you have the [prerequisites](#prerequisites) installed, you can get going by making sure `nvm` is using the correct version of nodeJS...
+```bash
+nvm install
+```
+...and then downloading all project dependencies.
+```bash
+yarn
+```
+Easy.
 
 ---
 **_Legal Notice_**  

@@ -31,6 +31,30 @@ const accessEnv = (key, secret = true) => {
     return value;
 };
 
+// extract SNS message contents from an SNS event
+const parseSnsMessage = (event) => {
+    console.log('Parsing SNS message...');
+    let message;
+    const rawMessage = event.Records[0].Sns.Message;
+    if (is.nullOrEmpty(rawMessage)) {
+        console.log('SNS message is empty.');
+        message = rawMessage;
+    } else if (is.string(rawMessage)) {
+        try {
+            message = JSON.parse(rawMessage);
+            console.log('SNS message parsed as JSON.');
+        } catch (error) {
+            console.log('SNS message is a non-empty string that does not parse as JSON.');
+            message = rawMessage;
+        }
+    } else {
+        console.log('SNS message is not empty or a string.');
+        message = rawMessage;
+    }
+    console.log('Parsed SNS message.');
+    return message;
+};
+
 // scrub sensitive data from a string
 const sanitize = (str) => str
     /* eslint-disable no-template-curly-in-string */
@@ -134,15 +158,8 @@ module.exports.hello = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
     // validate event schema
     joi.assert(event, snsEventSchema, 'SNS event failed joi schema validation!');
-    // message contents
-    let message;
-    try {
-        message = event.Records[0].Sns.Message;
-        console.log('Parsed SNS message.');
-    } catch (error) {
-        error.message = `Failed to parse message from SNS!\n${error.message}`;
-        throw error;
-    }
+    // parse and validate message contents
+    const message = parseSnsMessage(event);
     // send message to Telegram
     const response = await pushTelegramMsg(message, this.chatIdCustomer);
     // construct useful data to return

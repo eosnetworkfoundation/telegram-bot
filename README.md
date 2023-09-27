@@ -9,6 +9,7 @@
     1. [Test](#test)
 1. [Inputs](#inputs)
     1. [Environment Variables](#environment-variables)
+    1. [Events](#events)
 
 ## Development
 Start here to build this project or to contribute to this repo.
@@ -68,6 +69,82 @@ Key | Type | Description
 `TELEGRAM_CHAT_ID` | Required | Telegram chat ID for customer-facing notifications.
 `TELEGRAM_CHAT_ID_DEV` | Optional | Telegram chat ID for test notifications.
 `TELEGRAM_CHAT_ID_OWNER` | Optional | Telegram chat ID for runtime errors to be delivered to the bot owner, operator, or maintainer.
+
+### Events
+This lambda currently only supports SNS events as input. Event schema is validated using [joi](https://joi.dev). EventBridge events or inputs from other sources will throw a `ValidationError` exception.
+
+The SNS event schema looks like this.
+```json
+{
+  "Records": [
+    {
+      "EventSource": "aws:sns",
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:us-east-1:123456789012:sns-topic-name-goes-here:d9a4b8f1-36e7-4702-9e5d-2f1c871496ab",
+      "Sns": {
+        "Type": "Notification",
+        "MessageId": "f3a8c7e9-241b-4d61-9e0c-86d4b2f8c730",
+        "TopicArn": "arn:aws:sns:us-east-1:123456789012:sns-topic-name-goes-here",
+        "Subject": null,
+        "Message": "{\"version\":\"0\",\"id\":\"c4c1c1c9-6542-e61b-6ef0-8c4d36933a92\",\"detail-type\":\"CloudWatch Alarm State Change\",\"source\":\"aws.cloudwatch\",\"account\":\"123456789012\",\"time\":\"2019-10-02T17:04:40Z\",\"region\":\"us-east-1\",\"resources\":[\"arn:aws:cloudwatch:us-east-1:123456789012:alarm:ServerCpuTooHigh\"],\"detail\":{\"alarmName\":\"ServerCpuTooHigh\",\"configuration\":{\"description\":\"Goes into alarm when server CPU utilization is too high!\",\"metrics\":[{\"id\":\"30b6c6b2-a864-43a2-4877-c09a1afc3b87\",\"metricStat\":{\"metric\":{\"dimensions\":{\"InstanceId\":\"i-12345678901234567\"},\"name\":\"CPUUtilization\",\"namespace\":\"AWS/EC2\"},\"period\":300,\"stat\":\"Average\"},\"returnData\":true}]},\"previousState\":{\"reason\":\"Threshold Crossed: 1 out of the last 1 datapoints [0.0666851903306472 (01/10/19 13:46:00)] was not greater than the threshold (50.0) (minimum 1 datapoint for ALARM -> OK transition).\",\"reasonData\":\"{\\\"version\\\":\\\"1.0\\\",\\\"queryDate\\\":\\\"2019-10-01T13:56:40.985+0000\\\",\\\"startDate\\\":\\\"2019-10-01T13:46:00.000+0000\\\",\\\"statistic\\\":\\\"Average\\\",\\\"period\\\":300,\\\"recentDatapoints\\\":[0.0666851903306472],\\\"threshold\\\":50.0}\",\"timestamp\":\"2019-10-01T13:56:40.987+0000\",\"value\":\"OK\"},\"state\":{\"reason\":\"Threshold Crossed: 1 out of the last 1 datapoints [99.50160229693434 (02/10/19 16:59:00)] was greater than the threshold (50.0) (minimum 1 datapoint for OK -> ALARM transition).\",\"reasonData\":\"{\\\"version\\\":\\\"1.0\\\",\\\"queryDate\\\":\\\"2019-10-02T17:04:40.985+0000\\\",\\\"startDate\\\":\\\"2019-10-02T16:59:00.000+0000\\\",\\\"statistic\\\":\\\"Average\\\",\\\"period\\\":300,\\\"recentDatapoints\\\":[99.50160229693434],\\\"threshold\\\":50.0}\",\"timestamp\":\"2019-10-02T17:04:40.989+0000\",\"value\":\"ALARM\"}}}",
+        "Timestamp": "2023-09-26T00:31:17.412Z",
+        "SignatureVersion": "1",
+        "Signature": "VG9nZXJtZW50UGxhY2Vob2xkZXIxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMA==",
+        "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-s8f4a1b7c0e9d3a4e5e2b3d6a9c7b0f1.pem",
+        "UnsubscribeUrl": "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:123456789012:sns-topic-name-goes-here:d9a4b8f1-36e7-4702-9e5d-2f1c871496ab",
+        "MessageAttributes": {}
+      }
+    }
+  ]
+}
+```
+The SNS event contains a `message` payload from CloudWatch that looks like this when unpacked.
+```json
+{
+  "version": "0",
+  "id": "c4c1c1c9-6542-e61b-6ef0-8c4d36933a92",
+  "detail-type": "CloudWatch Alarm State Change",
+  "source": "aws.cloudwatch",
+  "account": "123456789012",
+  "time": "2019-10-02T17:04:40Z",
+  "region": "us-east-1",
+  "resources": ["arn:aws:cloudwatch:us-east-1:123456789012:alarm:ServerCpuTooHigh"],
+  "detail": {
+    "alarmName": "ServerCpuTooHigh",
+    "configuration": {
+      "description": "Goes into alarm when server CPU utilization is too high!",
+      "metrics": [{
+        "id": "30b6c6b2-a864-43a2-4877-c09a1afc3b87",
+        "metricStat": {
+          "metric": {
+            "dimensions": {
+              "InstanceId": "i-12345678901234567"
+            },
+            "name": "CPUUtilization",
+            "namespace": "AWS/EC2"
+          },
+          "period": 300,
+          "stat": "Average"
+        },
+        "returnData": true
+      }]
+    },
+    "previousState": {
+      "reason": "Threshold Crossed: 1 out of the last 1 datapoints [0.0666851903306472 (01/10/19 13:46:00)] was not greater than the threshold (50.0) (minimum 1 datapoint for ALARM -> OK transition).",
+      "reasonData": "{\"version\":\"1.0\",\"queryDate\":\"2019-10-01T13:56:40.985+0000\",\"startDate\":\"2019-10-01T13:46:00.000+0000\",\"statistic\":\"Average\",\"period\":300,\"recentDatapoints\":[0.0666851903306472],\"threshold\":50.0}",
+      "timestamp": "2019-10-01T13:56:40.987+0000",
+      "value": "OK"
+    },
+    "state": {
+      "reason": "Threshold Crossed: 1 out of the last 1 datapoints [99.50160229693434 (02/10/19 16:59:00)] was greater than the threshold (50.0) (minimum 1 datapoint for OK -> ALARM transition).",
+      "reasonData": "{\"version\":\"1.0\",\"queryDate\":\"2019-10-02T17:04:40.985+0000\",\"startDate\":\"2019-10-02T16:59:00.000+0000\",\"statistic\":\"Average\",\"period\":300,\"recentDatapoints\":[99.50160229693434],\"threshold\":50.0}",
+      "timestamp": "2019-10-02T17:04:40.989+0000",
+      "value": "ALARM"
+    }
+  }
+}
+```
+The schema of this CloudWatch "alarm state change" message is also validated using `joi`.
 
 ---
 **_Legal Notice_**  

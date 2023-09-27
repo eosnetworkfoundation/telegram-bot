@@ -57,7 +57,7 @@ yarn test
 The goal is full test coverage, not because we chased a number, but because we exhaustively tested all intended functionality.
 
 ## Inputs
-This lambda receives two primary inputs, SNS event payloads delivered by AWS and user-defined environment variables to configure the script.
+This lambda receives two primary inputs, AWS Simple Notification Service (SNS) event payloads delivered by AWS and user-defined environment variables to configure the script.
 
 ### Environment Variables
 This lambda is configured entirely with environment variables to make deployment in AWS easy.

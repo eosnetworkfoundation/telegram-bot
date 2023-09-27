@@ -195,9 +195,8 @@ module.exports.hello = async (event) => {
             status: response.status || null,
         },
     };
-    // sanitize result
+    // sanitize, print, and return result
     const result = sanitize(JSON.stringify(rawResult, null, 4));
     console.log('Done.', result);
-    // return useful information
     return result;
 };

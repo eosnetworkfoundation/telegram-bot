@@ -62,7 +62,7 @@ This lambda receives two primary inputs, SNS event payloads delivered by AWS and
 ### Environment Variables
 This lambda is configured entirely with environment variables to make deployment in AWS easy.
 
-Key | Type | Description
+Key | Usage | Description
 --- | --- | ---
 `AWS_LAMBDA_FUNCTION_NAME` | [AWS Intrinsic](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime) | The name of the lambda function, used when sending error notifications.
 `MAINTAINER` | Optional | Name or contact info for the bot maintainer.

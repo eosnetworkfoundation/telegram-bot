@@ -2,6 +2,23 @@ const axios = require('axios');
 const is = require('./is.js');
 const joi = require('joi');
 
+/* joi schema */
+// schema of a single SNS event "record"
+const snsEventRecordSchema = joi.object({
+    EventSource: joi.string().valid('aws:sns').required(),
+    Sns: joi.object({
+        Message: joi.string().required(),
+        Subject: joi.string().allow(null).required(),
+        TopicArn: joi.string().required(),
+        Type: joi.string().valid('Notification').required(),
+    }).unknown(),
+}).unknown().label('SNS event record');
+
+// schema of an SNS event containing one or more "records"
+const snsEventSchema = joi.object({
+    Records: joi.array().items(snsEventRecordSchema).min(1).required(),
+}).unknown();
+
 /* functions */
 // read an environment variable and log the status
 const accessEnv = (key, secret = true) => {
@@ -115,6 +132,8 @@ module.exports.entrypoint = async (event) => {
 
 module.exports.hello = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
+    // validate event schema
+    joi.assert(event, snsEventSchema, 'SNS event failed joi schema validation!');
     // message contents
     let message;
     try {

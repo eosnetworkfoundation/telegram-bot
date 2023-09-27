@@ -7,6 +7,7 @@
     1. [Initialization](#initialization)
     1. [Lint](#lint)
     1. [Test](#test)
+1. [Inputs](#inputs)
 
 ## Development
 Start here to build this project or to contribute to this repo.
@@ -51,6 +52,9 @@ This project uses the [jest](https://jestjs.io) test framework.
 yarn test
 ```
 The goal is full test coverage, not because we chased a number, but because we exhaustively tested all intended functionality.
+
+## Inputs
+This lambda receives two primary inputs, SNS event payloads delivered by AWS and user-defined environment variables to configure the script.
 
 ---
 **_Legal Notice_**  

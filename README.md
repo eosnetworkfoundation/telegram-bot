@@ -64,7 +64,7 @@ This lambda is configured entirely with environment variables to make deployment
 
 Key | Type | Description
 --- | --- | ---
-`AWS_LAMBDA_FUNCTION_NAME` | AWS Intrinsic | The name of the lambda function, used when sending error notifications.
+`AWS_LAMBDA_FUNCTION_NAME` | [AWS Intrinsic](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime) | The name of the lambda function, used when sending error notifications.
 `MAINTAINER` | Optional | Name or contact info for the bot maintainer.
 `TELEGRAM_API_KEY` | Required | The API key for the Telegram bot.
 `TELEGRAM_CHAT_ID` | Required | Telegram chat ID for customer-facing notifications.

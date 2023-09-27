@@ -1,5 +1,6 @@
 const axios = require('axios');
 const is = require('./is.js');
+const joi = require('joi');
 
 /* functions */
 // read an environment variable and log the status

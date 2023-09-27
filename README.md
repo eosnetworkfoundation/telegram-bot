@@ -10,6 +10,7 @@
 1. [Inputs](#inputs)
     1. [Environment Variables](#environment-variables)
     1. [Events](#events)
+1. [Outputs](#outputs)
 
 ## Development
 Start here to build this project or to contribute to this repo.
@@ -145,6 +146,25 @@ The SNS event contains a `message` payload from CloudWatch that looks like this 
 }
 ```
 The schema of this CloudWatch "alarm state change" message is also validated using `joi`.
+
+## Outputs
+This lambda has three primary outputs:
+1. Telegram messages:
+    - Customer-facing notifications.
+    - Developer-facing test notifications.
+    - Notifications about runtime errors intended for the maintainer.
+1. Logs in CloudWatch.
+1. Return value, a JSON object with this schema:
+    - **body**:
+        - **input** - original event received by the lambda.
+        - **message** - parsed SNS message.
+        - **output**:
+            - **data** - data from the Telegram API response.
+            - **error** - any error encountered during the Telegram request.
+            - **status** - HTTP status of the Telegram response.
+    - **statusCode** - HTTP response for the lambda as a whole.
+
+The lambda makes a good-faith attempt to sanitize secrets from Telegram message contents and log output, but it is ultimately the responsibility of the bot operator to ensure secrets are not leaked.
 
 ---
 **_Legal Notice_**  

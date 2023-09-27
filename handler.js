@@ -17,10 +17,10 @@ const accessEnv = (key, secret = true) => {
 // scrub sensitive data from a string
 const sanitize = (str) => str
     /* eslint-disable no-template-curly-in-string */
-    .replace(new RegExp(_apiKey, 'g'), '${TELEGRAM_API_KEY}')
-    .replace(new RegExp(this.chatIdCustomer, 'g'), '${TELEGRAM_CHAT_ID}')
-    .replace(new RegExp(this.chatIdDev, 'g'), '${TELEGRAM_CHAT_ID_DEV}')
-    .replace(new RegExp(this.chatIdOwner, 'g'), '${TELEGRAM_CHAT_ID_OWNER}');
+    .replace(new RegExp(process.env.TELEGRAM_API_KEY, 'g'), '${TELEGRAM_API_KEY}')
+    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID, 'g'), '${TELEGRAM_CHAT_ID}')
+    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID_DEV, 'g'), '${TELEGRAM_CHAT_ID_DEV}')
+    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID_OWNER, 'g'), '${TELEGRAM_CHAT_ID_OWNER}');
     /* eslint-enable no-template-curly-in-string */
 
 /* globals */

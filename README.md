@@ -70,6 +70,7 @@ Key | Usage | Type | Description
 `TELEGRAM_CHAT_ID` | Required | String | Telegram chat ID for customer-facing notifications.
 `TELEGRAM_CHAT_ID_DEV` | Optional | String | Telegram chat ID for test notifications.
 `TELEGRAM_CHAT_ID_OWNER` | Optional | String | Telegram chat ID for runtime errors to be delivered to the bot owner, operator, or maintainer.
+`TEST_NOTIFICATION_ARN` | Optional | JSON string array | List of SNS topic ARNs to send to `TELEGRAM_CHAT_ID_DEV` instead of `TELEGRAM_CHAT_ID`, for testing.
 
 ### Events
 This lambda currently only supports SNS events as input. Event schema is validated using [joi](https://joi.dev). EventBridge events or inputs from other sources will throw a `ValidationError` exception.

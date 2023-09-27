@@ -168,4 +168,4 @@ The lambda makes a good-faith attempt to sanitize secrets from Telegram message 
 
 ---
 > **_Legal Notice_**  
-Some content in this repo was generated in collaboration with one or more machine learning algorithms or weak artificial intelligence (AI). This notice is required in some countries.
+Some content in this repository was generated in collaboration with one or more machine learning algorithms or weak artificial intelligence (AI). This notice is required in some countries.

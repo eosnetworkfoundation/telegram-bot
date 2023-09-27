@@ -8,6 +8,7 @@
     1. [Lint](#lint)
     1. [Test](#test)
 1. [Inputs](#inputs)
+    1. [Environment Variables](#environment-variables)
 
 ## Development
 Start here to build this project or to contribute to this repo.
@@ -55,6 +56,18 @@ The goal is full test coverage, not because we chased a number, but because we e
 
 ## Inputs
 This lambda receives two primary inputs, SNS event payloads delivered by AWS and user-defined environment variables to configure the script.
+
+### Environment Variables
+This lambda is configured entirely with environment variables to make deployment in AWS easy.
+
+Key | Type | Description
+--- | --- | ---
+`AWS_LAMBDA_FUNCTION_NAME` | AWS Intrinsic | The name of the lambda function, used when sending error notifications.
+`MAINTAINER` | Optional | Name or contact info for the bot maintainer.
+`TELEGRAM_API_KEY` | Required | The API key for the Telegram bot.
+`TELEGRAM_CHAT_ID` | Required | Telegram chat ID for customer-facing notifications.
+`TELEGRAM_CHAT_ID_DEV` | Optional | Telegram chat ID for test notifications.
+`TELEGRAM_CHAT_ID_OWNER` | Optional | Telegram chat ID for runtime errors to be delivered to the bot owner, operator, or maintainer.
 
 ---
 **_Legal Notice_**  

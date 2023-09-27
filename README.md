@@ -167,5 +167,5 @@ This lambda has three primary outputs:
 The lambda makes a good-faith attempt to sanitize secrets from Telegram message contents and log output, but it is ultimately the responsibility of the bot operator to ensure secrets are not leaked.
 
 ---
-**_Legal Notice_**  
+> **_Legal Notice_**  
 Some content in this repo was generated in collaboration with one or more machine learning algorithms or weak artificial intelligence (AI). This notice is required in some countries.

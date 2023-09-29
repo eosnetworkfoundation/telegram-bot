@@ -141,13 +141,23 @@ Object.defineProperty(this, 'maintainer', {
 });
 
 /* telegram */
+// take a string and replace HTML characters with escape sequences as required for Telegram
+const enc = (str) => {
+    const replacements = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+    };
+    return str.replace(/[&<>]/g, char => replacements[char]);
+};
+
 // send a Telegram message
 const pushTelegramMsg = async (message, chatId = this.chatId) => {
     console.log('Sending message to Telegram...');
     const response = await this.api.get('', {
         params: {
             chat_id: chatId,
-            parse_mode: 'MarkdownV2',
+            parse_mode: 'HTML',
             text: sanitize(message),
         },
     });
@@ -158,7 +168,7 @@ const pushTelegramMsg = async (message, chatId = this.chatId) => {
 // send an error message to Telegram
 const pushTelegramMsgErr = (err) => {
     try {
-        const msg = `❗ **${process.env.AWS_LAMBDA_FUNCTION_NAME}** ❗\n**${err.name}:** ${err.message}\n\`\`\`\n${err.stack}\`\`\`\nPlease contact ${this.maintainer} if you see this message.`;
+        const msg = `❗ <b>${process.env.AWS_LAMBDA_FUNCTION_NAME}</b> ❗\n<b>${enc(err.name)}:</b> ${enc(err.message)}\n<pre>\n${enc(err.stack)}</pre>\nPlease contact ${enc(this.maintainer)} if you see this message.`;
         return pushTelegramMsg(msg, this.chatIdOwner || this.chatId);
     } catch (error) {
         console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', sanitize(error.toString())); // we do not propagate this error because there is a higher error we want to alert on

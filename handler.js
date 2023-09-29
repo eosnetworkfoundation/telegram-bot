@@ -192,7 +192,7 @@ const pushTelegramMsgErr = (err) => {
     try {
         const head = `❗ <b>${process.env.AWS_LAMBDA_FUNCTION_NAME}</b> ❗`;
         const gh = `<a href="${pkg.homepage}/tree/${this.version}">${enc(this.name)}:${pkg.git.tag || pkg.git.short_commit}</a>${(is.nullOrEmpty(pkg.git.tag)) ? ` on ${pkg.git.branch}` : ''}`;
-        const intro = `The <code>${process.env.AWS_LAMBDA_FUNCTION_NAME}</code> lambda built from ${gh} just threw the following error:`;
+        const intro = `The <code>${process.env.AWS_LAMBDA_FUNCTION_NAME}</code> lambda running ${gh} just threw the following error:`;
         const stack = `<pre>${enc(err.stack)}</pre>`;
         const logs = `&gt;&gt; <a href="${this.logUri}">CloudWatch Logs</a> &lt;&lt;`;
         const tail = `Please contact ${enc(this.maintainer)} if you see this message.`;

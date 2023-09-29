@@ -140,6 +140,16 @@ Object.defineProperty(this, 'maintainer', {
     get: () => accessEnv('MAINTAINER'),
 });
 
+// return the log URI
+Object.defineProperty(this, 'logUri', {
+    get: () => {
+        const region = process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION;
+        const logGroupName = encodeURIComponent(process.env.AWS_LAMBDA_LOG_GROUP_NAME);
+        const logStreamName = encodeURIComponent(process.env.AWS_LAMBDA_LOG_STREAM_NAME);
+        return `https://console.aws.amazon.com/cloudwatch/home?region=${region}#logsV2:log-groups/log-group/${logGroupName}/log-events/${logStreamName}`;
+    },
+});
+
 /* telegram */
 // take a string and replace HTML characters with escape sequences as required for Telegram
 const enc = (str) => {
@@ -168,7 +178,7 @@ const pushTelegramMsg = async (message, chatId = this.chatId) => {
 // send an error message to Telegram
 const pushTelegramMsgErr = (err) => {
     try {
-        const msg = `❗ <b>${process.env.AWS_LAMBDA_FUNCTION_NAME}</b> ❗\n\n<pre>${enc(err.stack)}</pre>\n\nPlease contact ${enc(this.maintainer)} if you see this message.`;
+        const msg = `❗ <b>${process.env.AWS_LAMBDA_FUNCTION_NAME}</b> ❗\n\n<pre>${enc(err.stack)}</pre>\n\n&gt;&gt; <a href="${this.logUri}">CloudWatch Logs</a> &lt;&lt;\n\nPlease contact ${enc(this.maintainer)} if you see this message.`;
         return pushTelegramMsg(msg, this.chatIdOwner || this.chatId);
     } catch (error) {
         console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', sanitize(error.toString())); // we do not propagate this error because there is a higher error we want to alert on

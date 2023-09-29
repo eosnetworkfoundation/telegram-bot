@@ -157,7 +157,7 @@ const pushTelegramMsg = async (message, chatId = this.chatId) => {
 // send an error message to Telegram
 const pushTelegramMsgErr = (err) => {
     try {
-        const msg = `❗ **${process.env.AWS_LAMBDA_FUNCTION_NAME}** ❗\n${err.fileName}:${err.lineNumber}:${err.columnNumber}\n**${err.name}:** ${err.message}\`\`\`\n${err.stack}\`\`\`\nPlease contact ${this.maintainer} if you see this message.`;
+        const msg = `❗ **${process.env.AWS_LAMBDA_FUNCTION_NAME}** ❗\n${err.fileName}:${err.lineNumber}:${err.columnNumber}\n**${err.name}:** ${err.message}\n\`\`\`\n${err.stack}\`\`\`\nPlease contact ${this.maintainer} if you see this message.`;
         return pushTelegramMsg(msg, this.chatIdOwner || this.chatId);
     } catch (error) {
         console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', sanitize(error.toString())); // we do not propagate this error because there is a higher error we want to alert on

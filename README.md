@@ -7,6 +7,7 @@
     1. [Initialization](#initialization)
     1. [Lint](#lint)
     1. [Test](#test)
+    1. [Build](#build)
 1. [Inputs](#inputs)
     1. [Environment Variables](#environment-variables)
     1. [Events](#events)
@@ -55,6 +56,15 @@ This project uses the [jest](https://jestjs.io) test framework.
 yarn test
 ```
 The goal is full test coverage, not because we chased a number, but because we exhaustively tested all intended functionality.
+
+### Build
+This is how release artifacts are generated.
+```bash
+yarn build
+```
+The "build" generates a `*.zip` archive in the root of the repo that can be uploaded directly to AWS Lambda using the web console, AWS CLI, or with something like ~~Terraform~~ Tofu.
+
+The output of `yarn pack` is **_not_** compatible with AWS. AWS requires the dependencies (`node_modules`) to be packed in the `*.zip` file for lambdas, so it may be wise to do your own build with updated dependencies to make sure your deployment is not missing any security patches published for dependencies since our latest release. If you are building a tag, the script requires the version in the `git` tag to match the version in the `package.json`. Finally, the build script does briefly move your `node_modules` folder in order to guarantee developer dependencies are not packed into the `*.zip` file so it is as small as possible. The script puts your `node_modules` back afterwards so this should hopefully not be a problem for anyone.
 
 ## Inputs
 This lambda receives two primary inputs, AWS Simple Notification Service (SNS) event payloads delivered by AWS and user-defined environment variables to configure the script.

@@ -230,7 +230,7 @@ module.exports.hello = async (event) => {
     const message = parseSnsMessage(event);
     joi.assert(message, cloudwatchEventSchema, 'SNS message failed joi schema validation!');
     // send message to Telegram
-    const response = await pushTelegramMsg(message, isDevSnsTopic(message) ? this.chatIdDev : this.chatIdCustomer);
+    const response = await pushTelegramMsg(JSON.stringify(message, null, 2), isDevSnsTopic(message) ? this.chatIdDev : this.chatIdCustomer);
     // construct useful data to return
     const rawResult = {
         input: event,

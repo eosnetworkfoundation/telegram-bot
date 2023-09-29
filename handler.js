@@ -158,7 +158,7 @@ Object.defineProperty(this, 'name', {
 
 // return the git version of this build
 Object.defineProperty(this, 'version', {
-    get: () => ((!is.nullOrEmpty(pkg.git.tag)) ? pkg.git.tag : `${pkg.git.branch}@${pkg.git.commit}`),
+    get: () => ((is.nullOrEmpty(pkg.git.tag)) ? pkg.git.commit : pkg.git.tag),
 });
 
 /* telegram */
@@ -191,7 +191,7 @@ const pushTelegramMsgErr = (err) => {
     try {
         const head = `❗ <b>${process.env.AWS_LAMBDA_FUNCTION_NAME}</b> ❗`;
         const stack = `<pre>${enc(err.stack)}</pre>`;
-        const gh = `${enc(this.name)}:${enc(this.version)}`;
+        const gh = `GitHub: <a href="${pkg.homepage}/tree/${this.version}">${enc(this.name)}:${this.version}</a>`;
         const logs = `&gt;&gt; <a href="${this.logUri}">CloudWatch Logs</a> &lt;&lt;`;
         const tail = `Please contact ${enc(this.maintainer)} if you see this message.`;
         // join message parts

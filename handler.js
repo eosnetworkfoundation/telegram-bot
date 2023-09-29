@@ -192,7 +192,7 @@ const pushTelegramMsgErr = (err) => {
     try {
         const head = `❗ <b>${process.env.AWS_LAMBDA_FUNCTION_NAME}</b> ❗`;
         const stack = `<pre>${enc(err.stack)}</pre>`;
-        const gh = `GitHub: <a href="${pkg.homepage}/tree/${this.version}">${enc(this.name)}:${this.version}</a>`;
+        const gh = `GitHub: <a href="${pkg.homepage}/tree/${this.version}">${enc(this.name)}:${pkg.git.tag || pkg.git.short_commit}</a>`;
         const logs = `&gt;&gt; <a href="${this.logUri}">CloudWatch Logs</a> &lt;&lt;`;
         const tail = `Please contact ${enc(this.maintainer)} if you see this message.`;
         // join message parts

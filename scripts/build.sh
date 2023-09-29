@@ -46,10 +46,10 @@ echo 'Installing production dependencies...'
 ee 'yarn --prod --frozen-lockfile --non-interactive'
 echo 'Done installing production dependencies.'
 # pack a dist.zip for AWS
-if [[ -n "$GIT_TAG" ]]; then
-    ZIP_NAME="$PACKAGE_NAME-$GIT_TAG.dist.zip"
+if [[ -n "$SANITIZED_TAG" ]]; then
+    ZIP_NAME="$PACKAGE_NAME-$SANITIZED_TAG.dist.zip"
 else
-    ZIP_NAME="$PACKAGE_NAME-$GIT_BRANCH-$GIT_SHORT_COMMIT.dist.zip"
+    ZIP_NAME="$PACKAGE_NAME-$SANITIZED_BRANCH-$GIT_SHORT_COMMIT.dist.zip"
 fi
 echo "Packing \"$ZIP_NAME\" for AWS..."
 FILES="$(cat package.json | jq -r '.files[]' | tr '\n' ' ')"

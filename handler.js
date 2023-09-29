@@ -1,6 +1,7 @@
 const axios = require('axios');
 const is = require('./is.js');
 const joi = require('joi');
+const pkg = require('./package.json');
 
 /* joi schema */
 // schema of a CloudWatch alarm state
@@ -150,6 +151,16 @@ Object.defineProperty(this, 'logUri', {
     },
 });
 
+// return the package name
+Object.defineProperty(this, 'name', {
+    get: () => pkg.name,
+});
+
+// return the git version of this build
+Object.defineProperty(this, 'version', {
+    get: () => ((!is.nullOrEmpty(pkg.git.tag)) ? pkg.git.tag : `${pkg.git.branch}@${pkg.git.commit}`),
+});
+
 /* telegram */
 // take a string and replace HTML characters with escape sequences as required for Telegram
 const enc = (str) => {
@@ -178,7 +189,7 @@ const pushTelegramMsg = async (message, chatId = this.chatId) => {
 // send an error message to Telegram
 const pushTelegramMsgErr = (err) => {
     try {
-        const msg = `❗ <b>${process.env.AWS_LAMBDA_FUNCTION_NAME}</b> ❗\n\n<pre>${enc(err.stack)}</pre>\n\n&gt;&gt; <a href="${this.logUri}">CloudWatch Logs</a> &lt;&lt;\n\nPlease contact ${enc(this.maintainer)} if you see this message.`;
+        const msg = `❗ <b>${process.env.AWS_LAMBDA_FUNCTION_NAME}</b> ❗\n\n<pre>${enc(err.stack)}</pre>\n\n${enc(this.name)}:${enc(this.version)}\n&gt;&gt; <a href="${this.logUri}">CloudWatch Logs</a> &lt;&lt;\n\nPlease contact ${enc(this.maintainer)} if you see this message.`;
         return pushTelegramMsg(msg, this.chatIdOwner || this.chatId);
     } catch (error) {
         console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', sanitize(error.toString())); // we do not propagate this error because there is a higher error we want to alert on

@@ -55,7 +55,7 @@ const accessEnv = (key, secret = true) => {
 
 // determine if an SNS message came from an SNS topic used for testing
 const isDevSnsTopic = (message) => {
-    const testArn = accessEnv('TEST_NOTIFICATION_ARN');
+    const testArn = accessEnv('DEV_EVENT_SOURCE_ARN');
     return !is.nullOrEmpty(testArn) && (testArn.includes(message.TopicArn) || testArn.includes('*'));
 };
 

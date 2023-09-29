@@ -65,12 +65,12 @@ This lambda is configured entirely with environment variables to make deployment
 Key | Usage | Type | Description
 --- | --- | --- | ---
 `AWS_LAMBDA_FUNCTION_NAME` | [AWS Intrinsic](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime) | String | The name of the lambda function, used when sending error notifications.
+`DEV_EVENT_SOURCE_ARN` | Optional | JSON string array | List of event source ARNs to send to `TELEGRAM_CHAT_ID_DEV` instead of `TELEGRAM_CHAT_ID`, for testing.
 `MAINTAINER` | Optional | String | Name or contact info for the bot maintainer.
 `TELEGRAM_API_KEY` | Required | String | The API key for the Telegram bot.
 `TELEGRAM_CHAT_ID` | Required | String | Telegram chat ID for customer-facing notifications.
 `TELEGRAM_CHAT_ID_DEV` | Optional | String | Telegram chat ID for test notifications.
 `TELEGRAM_CHAT_ID_OWNER` | Optional | String | Telegram chat ID for runtime errors to be delivered to the bot owner, operator, or maintainer.
-`TEST_NOTIFICATION_ARN` | Optional | JSON string array | List of SNS topic ARNs to send to `TELEGRAM_CHAT_ID_DEV` instead of `TELEGRAM_CHAT_ID`, for testing.
 
 ### Events
 This lambda currently only supports SNS events as input. Event schema is validated using [joi](https://joi.dev). EventBridge events or inputs from other sources will throw a `ValidationError` exception.

@@ -21,7 +21,6 @@ PACKAGE_VERSION="$(cat package.json | jq -r '.version')"
 echo "Found package.json for \"$PACKAGE_NAME\" version \"$PACKAGE_VERSION\"."
 # git info
 GIT_BRANCH="$(git branch --show-current)"
-GIT_COMMIT="$(git rev-parse HEAD)"
 GIT_SHORT_COMMIT="$(git rev-parse --short HEAD)"
 GIT_TAG="$(git --no-pager tag --points-at HEAD)"
 SANITIZED_BRANCH="$(sanitize "$GIT_BRANCH")"

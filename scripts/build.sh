@@ -20,9 +20,10 @@ PACKAGE_NAME="$(cat package.json | jq -r '.name')"
 PACKAGE_VERSION="$(cat package.json | jq -r '.version')"
 echo "Found package.json for \"$PACKAGE_NAME\" version \"$PACKAGE_VERSION\"."
 # git info
-GIT_BRANCH="$(git branch --show-current)"
-GIT_SHORT_COMMIT="$(git rev-parse --short HEAD)"
-GIT_TAG="$(git --no-pager tag --points-at HEAD)"
+export GIT_BRANCH="$(git branch --show-current)"
+export GIT_COMMIT="$(git rev-parse HEAD)"
+export GIT_SHORT_COMMIT="$(git rev-parse --short HEAD)"
+export GIT_TAG="$(git --no-pager tag --points-at HEAD)"
 SANITIZED_BRANCH="$(sanitize "$GIT_BRANCH")"
 SANITIZED_TAG="$(sanitize "$GIT_TAG")"
 # verify tag matches package.json version, if it exists
@@ -34,12 +35,15 @@ if [[ -n "$GIT_TAG" && "$GIT_TAG" != "v$PACKAGE_VERSION" ]]; then
     exit 10
 fi
 # backup node_modules
-unset UNIX_TIME
+UNIX_TIME="$(date +%s)"
 if [[ -d node_modules ]]; then
     echo 'Backing up your node_modules folder. It will be restored after the build.'
-    UNIX_TIME="$(date +%s)"
     ee "mv 'node_modules' 'node_modules.$UNIX_TIME.bak'"
 fi
+# pack metadata into the package.json
+echo 'Adding git metadata to package.json.'
+ee "mv package.json package.json.$UNIX_TIME.bak"
+cat package.json.$UNIX_TIME.bak | jq --arg branch "$GIT_BRANCH" --arg commit "$GIT_COMMIT" --arg tag "$GIT_TAG" '. + {git: {branch: $branch, commit: $commit, tag: (if $tag == "" then null else $tag end)}}' > package.json
 # install dependencies, but not dev dependencies
 echo 'Installing production dependencies...'
 ee 'yarn --prod --frozen-lockfile --non-interactive'
@@ -54,8 +58,10 @@ echo "Packing \"$ZIP_NAME\" for AWS..."
 FILES="$(cat package.json | jq -r '.files[]' | tr '\n' ' ')"
 ee "zip -r '$ZIP_NAME' ${FILES}LICENSE node_modules package.json README.md"
 echo "Done packing \"$ZIP_NAME\" for AWS."
+# put package.json back
+ee "mv package.json.$UNIX_TIME.bak package.json"
 # restore original node_modules, if it existed
-if [[ -n "$UNIX_TIME" ]]; then
+if [[ -d "node_modules.$UNIX_TIME.bak" ]]; then
     echo 'Restoring your node_modules folder.'
     ee 'rm -rf node_modules'
     ee "mv 'node_modules.$UNIX_TIME.bak' 'node_modules'"

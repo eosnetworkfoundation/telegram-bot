@@ -147,6 +147,7 @@ const pushTelegramMsg = async (message, chatId = this.chatId) => {
     const response = await this.api.get('', {
         params: {
             chat_id: chatId,
+            parse_mode: 'MarkdownV2',
             text: sanitize(message),
         },
     });

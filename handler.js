@@ -197,7 +197,7 @@ const pushTelegramMsgErr = (err) => {
         const logs = `&gt;&gt; <a href="${this.logUri}">CloudWatch Logs</a> &lt;&lt;`;
         const tail = `Please contact ${enc(this.maintainer)} if you see this message.`;
         // join message parts
-        const msg = `${head}\n\n${intro}\n${stack}\n\n${logs}\n\n${tail}`;
+        const msg = `${head}\n${intro}\n\n${stack}\n\n${logs}\n\n${tail}`;
         return pushTelegramMsg(msg, this.chatIdOwner || this.chatId);
     } catch (error) {
         console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', sanitize(error.toString())); // we do not propagate this error because there is a higher error we want to alert on

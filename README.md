@@ -1,6 +1,9 @@
 # Telegram Bot
 "[Serverless](https://www.serverless.com)" JavaScript project to deliver instant message (IM) notifications via Telegram using an Amazon Web Services (AWS) [Lambda](https://aws.amazon.com/lambda).
 
+> [!IMPORTANT]
+> Only tagged releases are considered "stable" software in this repo at this time.
+
 ### Index
 1. [Development](#development)
     1. [Prerequisites](#prerequisites)

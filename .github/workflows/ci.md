@@ -1,5 +1,5 @@
 # telegram-bot CI
-This GitHub Actions workflow lints and tests the `telegram-bot` JavaScript project, then "builds" a `dist.zip` that can be uploaded directly to Amazon Web Services (AWS) [Lambda](https://aws.amazon.com/lambda).
+This GitHub Actions workflow lints and tests the `telegram-bot` JavaScript project, then "builds" a `*.zip` file that can be uploaded directly to Amazon Web Services (AWS) [Lambda](https://aws.amazon.com/lambda).
 
 ### Index
 1. [Triggers](#triggers)

@@ -1,0 +1,61 @@
+name: telegram-bot CI
+
+on:
+  push:
+    branches:
+      - main
+      - release/*
+    tags:
+      - v*
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  documentation:
+    name: Attach Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: 'false'
+
+      - name: Attach Documentation
+        run: cat .github/workflows/ci.md >> $GITHUB_STEP_SUMMARY
+
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14, 16, 18]
+
+    name: Build telegram-bot - nodeJS v${{ matrix.node-version }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup node v${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Init - node v${{ matrix.node-version }}
+        run: yarn --frozen-lockfile --non-interactive
+
+      - name: Lint - node v${{ matrix.node-version }}
+        run: yarn lint
+
+      - name: Test - node v${{ matrix.node-version }}
+        run: yarn test
+
+      - name: Build - node v${{ matrix.node-version }}
+        run: yarn build
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: telegram-bot-${{ matrix.node-version }}
+          path: telegram-bot-*.zip

@@ -13,8 +13,10 @@ function sanitize()
 }
 
 echo "Starting build. - ${BASH_SOURCE[0]}"
+# environment
 NPM_ROOT="$(npm run env | grep '^PWD' | cut -d '=' -f '2')"
 pushd "$NPM_ROOT"
+NODE_MAJOR_VERSION="$(node --version | tr -d 'v' | cut -d '.' -f '1')"
 # package info
 PACKAGE_NAME="$(cat package.json | jq -r '.name')"
 PACKAGE_VERSION="$(cat package.json | jq -r '.version')"
@@ -50,9 +52,9 @@ ee 'yarn --prod --frozen-lockfile --non-interactive'
 echo 'Done installing production dependencies.'
 # pack a dist.zip for AWS
 if [[ -n "$SANITIZED_TAG" ]]; then
-    ZIP_NAME="$PACKAGE_NAME-$SANITIZED_TAG.dist.zip"
+    ZIP_NAME="$PACKAGE_NAME-$SANITIZED_TAG-node-$NODE_MAJOR_VERSION.dist.zip"
 else
-    ZIP_NAME="$PACKAGE_NAME-$SANITIZED_BRANCH-$GIT_SHORT_COMMIT.dist.zip"
+    ZIP_NAME="$PACKAGE_NAME-$SANITIZED_BRANCH-$GIT_SHORT_COMMIT-node-$NODE_MAJOR_VERSION.dist.zip"
 fi
 echo "Packing \"$ZIP_NAME\" for AWS..."
 FILES="$(cat package.json | jq -r '.files[]' | tr '\n' ' ')"

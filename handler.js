@@ -183,6 +183,11 @@ const pushTelegramMsg = async (message, chatId = this.chatId) => {
             text: sanitize(message),
         },
     });
+    if (response.status >= 300) {
+        const msg = `Telegram returned an unexpected ${response.status} HTTP status code.`;
+        console.error(`ERROR: ${msg}`, sanitize(response.data.toString()));
+        throw new Error(msg);
+    }
     console.log('Telegram message sent.');
     return response;
 };

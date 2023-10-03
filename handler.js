@@ -217,7 +217,7 @@ module.exports.entrypoint = async (event) => {
         body: 'FATAL: Unknown error!',
     };
     try {
-        result.body = await this.hello(event);
+        result.body = await this.handler(event);
         result.statusCode = 200;
     } catch (error) {
         result.body = error;
@@ -227,7 +227,8 @@ module.exports.entrypoint = async (event) => {
     return result;
 };
 
-module.exports.hello = async (event) => {
+// handle SNS event
+module.exports.handler = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
     // validate event schema
     joi.assert(event, snsEventSchema, 'SNS event failed joi schema validation!');

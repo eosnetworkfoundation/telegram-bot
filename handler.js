@@ -252,7 +252,8 @@ module.exports.formatCloudwatchEvent = (message) => {
     }
     const head = `${emoji} <b>${message.detail.alarmName}</b> ${emoji}`;
     const intro = `The <code>${message.detail.alarmName}</code> alarm is ${state}!`;
-    return `${head}\n${intro}`;
+    const description = enc(message.detail.configuration.description);
+    return `${head}\n${intro}\n${description}`;
 };
 
 // handle SNS event

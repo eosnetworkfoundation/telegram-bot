@@ -82,7 +82,9 @@ This repo contains the following GitHub Actions workflow for continuous integrat
 See the pipeline documentation for more information.
 
 ## Inputs
-This lambda receives two primary inputs, AWS Simple Notification Service (SNS) event payloads delivered by AWS and user-defined environment variables to configure the script.
+This lambda receives two primary inputs:
+1. AWS Simple Notification Service (SNS) event payloads delivered by AWS.
+1. User-defined environment variables to configure the script.
 
 ### Environment Variables
 This lambda is configured entirely with environment variables to make deployment in AWS easy.

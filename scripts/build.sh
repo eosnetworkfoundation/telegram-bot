@@ -19,13 +19,6 @@ pushd "$NPM_ROOT"
 ee node --version
 ee yarn --version
 ee npm --version
-if [[ -n "$GITHUB_TRIGGERING_ACTOR" ]]; then
-    export ACTOR="$GITHUB_TRIGGERING_ACTOR"
-elif [[ -n "$GITHUB_ACTOR" ]]; then
-    export ACTOR="$GITHUB_ACTOR"
-else
-    export ACTOR="$USER@$HOSTNAME"
-fi
 NODE_MAJOR_VERSION="$(node --version | tr -d 'v' | cut -d '.' -f '1')"
 # package info
 PACKAGE_NAME="$(cat package.json | jq -r '.name')"
@@ -41,6 +34,14 @@ export GIT_SHORT_COMMIT="$(git rev-parse --short HEAD)"
 export GIT_TAG="$(git --no-pager tag --points-at HEAD)"
 SANITIZED_BRANCH="$(sanitize "$GIT_BRANCH")"
 SANITIZED_TAG="$(sanitize "$GIT_TAG")"
+# github actions info
+if [[ -n "$GITHUB_TRIGGERING_ACTOR" ]]; then
+    export ACTOR="$GITHUB_TRIGGERING_ACTOR"
+elif [[ -n "$GITHUB_ACTOR" ]]; then
+    export ACTOR="$GITHUB_ACTOR"
+else
+    export ACTOR="$USER@$HOSTNAME"
+fi
 # verify tag matches package.json version, if it exists
 if [[ -n "$GIT_TAG" && "$GIT_TAG" != "v$PACKAGE_VERSION" ]]; then
     printf '\e[1;31mERROR: The git tag does not match the package.json version!\e[0m\n'

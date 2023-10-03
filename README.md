@@ -20,6 +20,9 @@ JavaScript project to deliver instant message (IM) notifications via Telegram us
 ## Development
 Start here to build this project or to contribute to this repo.
 
+> [!NOTE]
+> The source of truth for the version of nodeJS this project supports is the [`.nvmrc`](./.nvmrc) file. Backward- or forward-compatibility with other versions of `node` is made on a best-effort basis, but is not guaranteed.
+
 ### Prerequisites
 You will need the following tools:
 - [nvm](https://github.com/nvm-sh/nvm#installing-and-updating)

@@ -19,7 +19,13 @@ pushd "$NPM_ROOT"
 ee node --version
 ee yarn --version
 ee npm --version
-export ACTOR="$([[ -n "$GITHUB_ACTOR" ]] && echo "$GITHUB_ACTOR" || echo "$USER@$HOSTNAME")"
+if [[ -n "$GITHUB_TRIGGERING_ACTOR" ]]; then
+    export ACTOR="$GITHUB_TRIGGERING_ACTOR"
+elif [[ -n "$GITHUB_ACTOR" ]]; then
+    export ACTOR="$GITHUB_ACTOR"
+else
+    export ACTOR="$USER@$HOSTNAME"
+fi
 NODE_MAJOR_VERSION="$(node --version | tr -d 'v' | cut -d '.' -f '1')"
 # package info
 PACKAGE_NAME="$(cat package.json | jq -r '.name')"

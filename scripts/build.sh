@@ -52,7 +52,7 @@ if [[ -n "$GIT_TAG" && "$GIT_TAG" != "v$PACKAGE_VERSION" ]]; then
     exit 10
 fi
 # backup node_modules
-UNIX_TIME="$(date +%s)"
+export UNIX_TIME="$(date +%s)"
 if [[ -d node_modules ]]; then
     echo 'Backing up your node_modules folder. It will be restored after the build.'
     ee "mv 'node_modules' 'node_modules.$UNIX_TIME.bak'"
@@ -71,6 +71,7 @@ cat package.json.$UNIX_TIME.bak | jq \
         build: (if $is_gh_action then (env.GITHUB_RUN_NUMBER | tonumber) else "local" end),
         build_id: (if $is_gh_action then (env.GITHUB_RUN_ID | tonumber) else null end),
         build_node_version: $node_version,
+        build_time: (env.UNIX_TIME | tonumber),
         build_url: (if $is_gh_action then (env.GITHUB_SERVER_URL + "/" + env.GITHUB_REPOSITORY + "/actions/runs/" + env.GITHUB_RUN_ID) else null end),
         commit: env.GIT_COMMIT,
         short_commit: env.GIT_SHORT_COMMIT,

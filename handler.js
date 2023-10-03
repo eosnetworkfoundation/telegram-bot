@@ -59,7 +59,7 @@ const accessEnv = (key, secret = true) => {
 // determine if an SNS event came from an SNS topic used for testing
 const isDevSnsTopic = (event) => {
     const testArn = accessEnv('DEV_EVENT_SOURCE_ARN');
-    return !is.nullOrEmpty(testArn) && (testArn.includes(event.TopicArn) || testArn.includes('*'));
+    return !is.nullOrEmpty(testArn) && (testArn.includes(event.Records[0].Sns.TopicArn) || testArn.includes('*'));
 };
 
 // parse alarm state reasonData

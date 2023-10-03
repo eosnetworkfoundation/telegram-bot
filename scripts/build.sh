@@ -57,7 +57,7 @@ cat package.json.$UNIX_TIME.bak | jq \
     --arg short "$GIT_SHORT_COMMIT" \
     --arg tag "$GIT_TAG" \
     '.git += {
-        branch: $branch,
+        branch: (if $branch == "" then null else $branch end),
         commit: $commit,
         short_commit: $short,
         tag: (if $tag == "" then null else $tag end)

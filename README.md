@@ -177,6 +177,24 @@ The SNS event contains a `message` payload from CloudWatch that looks like this 
 ```
 The schema of this CloudWatch "alarm state change" message is also validated using `joi`.
 
+The `reasonData` field looks like this when parsed and expanded.
+```json
+{
+  "reasonData": {
+    "version": "1.0",
+    "queryDate": "2019-10-02T17:04:40.985+0000",
+    "startDate": "2019-10-02T16:59:00.000+0000",
+    "statistic": "Average",
+    "period": 300,
+    "recentDatapoints": [
+      99.50160229693434
+    ],
+    "threshold": 50
+  }
+}
+```
+The `resultData` schema is not validated as of this writing because no fields are consumed from it. Check out the source code for definitive, up-to-date information on which fields are being consumed and what the expected schema are.
+
 ## Outputs
 This lambda has three primary outputs:
 1. Telegram messages:

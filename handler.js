@@ -238,11 +238,13 @@ module.exports.entrypoint = async (event) => {
 
 // format SNS message for humans
 module.exports.formatCloudwatchEvent = (message) => {
-    let emoji = '❔';
+    let emoji;
     if (message.detail.state.value === 'ALARM') {
         emoji = '❌';
     } else if (message.detail.state.value === 'OK') {
         emoji = '✅';
+    } else {
+        emoji = '❔';
     }
     const head = `${emoji} <b>${message.detail.alarmName}</b> ${emoji}`;
     return head;

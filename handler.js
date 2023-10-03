@@ -227,6 +227,18 @@ module.exports.entrypoint = async (event) => {
     return result;
 };
 
+// format SNS message for humans
+module.exports.formatCloudwatchEvent = (message) => {
+    let emoji = '❔';
+    if (message.detail.state.value === 'ALARM') {
+        emoji = '❌';
+    } else if (message.detail.state.value === 'OK') {
+        emoji = '✅';
+    }
+    const head = `${emoji} <b>${message.detail.alarmName}</b> ${emoji}`;
+    return head;
+};
+
 // handle SNS event
 module.exports.handler = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
@@ -236,7 +248,7 @@ module.exports.handler = async (event) => {
     const message = parseSnsMessage(event);
     joi.assert(message, cloudwatchEventSchema, 'SNS message failed joi schema validation!');
     // send message to Telegram
-    const response = await pushTelegramMsg(JSON.stringify(message, null, 2), isDevSnsTopic(message) ? this.chatIdDev : this.chatIdCustomer);
+    const response = await pushTelegramMsg(this.formatCloudwatchEvent(message), isDevSnsTopic(message) ? this.chatIdDev : this.chatIdCustomer);
     // construct useful data to return
     const rawResult = {
         input: event,

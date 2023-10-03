@@ -57,5 +57,5 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: telegram-bot-${{ matrix.node-version }}
+          name: telegram-bot-node-${{ matrix.node-version }}
           path: telegram-bot-*.zip

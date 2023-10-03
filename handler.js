@@ -7,6 +7,7 @@ const pkg = require('./package.json');
 // schema of a CloudWatch alarm state
 const cloudwatchAlarmStateSchema = joi.object({
     reason: joi.string().required(),
+    reasonData: joi.string().required(),
     timestamp: joi.string().isoDate().required(),
     value: joi.string().valid('ALARM', 'OK', 'INSUFFICIENT_DATA').required(),
 }).unknown();
@@ -58,6 +59,14 @@ const accessEnv = (key, secret = true) => {
 const isDevSnsTopic = (message) => {
     const testArn = accessEnv('DEV_EVENT_SOURCE_ARN');
     return !is.nullOrEmpty(testArn) && (testArn.includes(message.TopicArn) || testArn.includes('*'));
+};
+
+// parse alarm state reasonData
+const parseReasonData = (message) => {
+    const output = message;
+    output.detail.previousState.reasonData = JSON.parse(message.detail.previousState.reasonData);
+    output.detail.state.reasonData = JSON.parse(message.detail.state.reasonData);
+    return output;
 };
 
 // extract SNS message contents from an SNS event
@@ -245,8 +254,9 @@ module.exports.handler = async (event) => {
     // validate event schema
     joi.assert(event, snsEventSchema, 'SNS event failed joi schema validation!');
     // parse and validate message contents
-    const message = parseSnsMessage(event);
+    let message = parseSnsMessage(event);
     joi.assert(message, cloudwatchEventSchema, 'SNS message failed joi schema validation!');
+    message = parseReasonData(message);
     // send message to Telegram
     const response = await pushTelegramMsg(this.formatCloudwatchEvent(message), isDevSnsTopic(message) ? this.chatIdDev : this.chatIdCustomer);
     // construct useful data to return

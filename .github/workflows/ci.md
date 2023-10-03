@@ -40,8 +40,8 @@ This workflow produces the following outputs:
 > 📁 Due to actions/upload-artifact [issue 39](https://github.com/actions/upload-artifact/issues/39) which has been open for over _three years and counting_, the archives attached as artifacts will be zipped by GitHub when you download them such that you get a `*.zip` containing the `telegram-bot-*.zip`. There is nothing anyone can do about this except for Microsoft/GitHub.
 
 ## See Also
-- [Project Documentation](../../README.md)
 - [Pipeline](https://github.com/eosnetworkfoundation/telegram-bot/actions/workflows/ci.yml)
+- [Project Documentation](../../README.md)
 
 For assistance with the CI system, please open an issue in this repo or reach out to the ENF Automation team.
 

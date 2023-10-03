@@ -181,6 +181,9 @@ const enc = (str) => {
     return str.replace(/[&<>]/g, char => replacements[char]);
 };
 
+// replace pairs of back-ticks with HTML code tags
+const parseInlineCode = str => str.replace(/`([^`]+)`/g, '<code>$1</code>');
+
 // send a Telegram message
 const pushTelegramMsg = async (message, chatId = this.chatId) => {
     console.log('Sending message to Telegram...');
@@ -252,7 +255,7 @@ module.exports.formatCloudwatchEvent = (message) => {
     }
     const head = `${emoji} <b>${message.detail.alarmName}</b> ${emoji}`;
     const intro = `The <code>${message.detail.alarmName}</code> alarm is ${state}!`;
-    const description = enc(message.detail.configuration.description);
+    const description = parseInlineCode(enc(message.detail.configuration.description));
     return `${head}\n${intro}\n${description}`;
 };
 

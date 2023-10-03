@@ -1,6 +1,7 @@
 const axios = require('axios');
 const is = require('./is.js');
 const joi = require('joi');
+const moment = require('moment-timezone');
 const pkg = require('./package.json');
 
 /* joi schema */
@@ -165,6 +166,22 @@ Object.defineProperty(this, 'name', {
     get: () => pkg.name,
 });
 
+// return timezones of interest
+let _tz;
+Object.defineProperty(this, 'timezone', {
+    get: () => {
+        if (is.nullOrEmpty(_tz)) {
+            const tz = accessEnv('TZ');
+            if (is.nullOrEmpty(tz) || tz === '[]') {
+                _tz = ['UTC'];
+            } else {
+                _tz = JSON.parse(tz);
+            }
+        }
+        return _tz;
+    },
+});
+
 // return the git version of this build
 Object.defineProperty(this, 'version', {
     get: () => ((is.nullOrEmpty(pkg.git.tag)) ? pkg.git.commit : pkg.git.tag),
@@ -257,7 +274,15 @@ module.exports.formatCloudwatchEvent = (message) => {
     const intro = `The <code>${message.detail.alarmName}</code> alarm is ${state}!`;
     const description = parseInlineCode(enc(message.detail.configuration.description));
     const reason = enc(message.detail.state.reason.replace(/ [(][^)]*[0-9]{2}\/[0-9]{2}\/[0-9]{2}[^)]*[)]/, '')); // remove ambiguous timestamp(s) from reason string
-    return `${head}\n${intro}\n${description}\n\n${reason}`;
+    // print timestamp in timezones of interest
+    const time = moment(message.detail.state.timestamp);
+    let timestamp = 'Timestamp:\n<pre>';
+    for (let i = 0; i < this.timezone.length; i++) {
+        timestamp += `${time.tz(this.timezone[i]).format('YYYY-MM-DD HH:mm:ss.SSS z')}\n`;
+    }
+    timestamp += '</pre>';
+    // construct and return message
+    return `${head}\n${intro}\n${description}\n\n${reason}\n\n${timestamp}`;
 };
 
 // handle SNS event

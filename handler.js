@@ -256,7 +256,7 @@ module.exports.formatCloudwatchEvent = (message) => {
     const head = `${emoji} <b>${message.detail.alarmName}</b> ${emoji}`;
     const intro = `The <code>${message.detail.alarmName}</code> alarm is ${state}!`;
     const description = parseInlineCode(enc(message.detail.configuration.description));
-    const reason = enc(message.detail.state.reason);
+    const reason = enc(message.detail.state.reason.replace(/ [(][^)]*[0-9]{2}\/[0-9]{2}\/[0-9]{2}[^)]*[)]/, '')); // remove ambiguous timestamp(s) from reason string
     return `${head}\n${intro}\n${description}\n\n${reason}`;
 };
 

@@ -283,7 +283,7 @@ module.exports.formatCloudwatchEvent = (message) => {
     }
     timestamp += '</pre>';
     // construct and return message
-    return `${head}\n${intro}\n\n${description}\n\nReason:<pre>${reason}</pre>\n${timestamp}\n${tail}`;
+    return `${head}\n${intro} ${description}\n\nReason:<pre>${reason}</pre>\n${timestamp}\n${tail}`;
 };
 
 // handle SNS event

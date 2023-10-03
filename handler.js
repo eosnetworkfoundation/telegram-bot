@@ -260,21 +260,24 @@ module.exports.entrypoint = async (event) => {
 module.exports.formatCloudwatchEvent = (message) => {
     let emoji;
     let state;
+    let tail;
     if (message.detail.state.value === 'ALARM') {
         emoji = '❌';
         state = 'triggered';
+        tail = 'Please put eyes 👀 on this message if you are investigating this.';
     } else if (message.detail.state.value === 'OK') {
         emoji = '✅';
         state = 'resolved';
+        tail = 'Yaaaaay! 🎉';
     } else {
         emoji = '❔';
         state = 'ambiguous';
+        tail = `Contact ${enc(this.maintainer)} if this does not resolve in ten minutes or so.`;
     }
     const head = `${emoji} <b>${message.detail.alarmName}</b> ${emoji}`;
     const intro = `The <code>${message.detail.alarmName}</code> alarm is ${state}!`;
     const description = parseInlineCode(enc(message.detail.configuration.description));
     const reason = enc(message.detail.state.reason.replace(/ [(][^)]*[0-9]{2}\/[0-9]{2}\/[0-9]{2}[^)]*[)]/, '')); // remove ambiguous timestamp(s) from reason string
-    const tail = 'Please put eyes 👀 on this message if you are investigating this.';
     // print timestamp in timezones of interest
     const time = moment(message.detail.state.timestamp);
     let timestamp = 'Timestamp:\n<pre>';

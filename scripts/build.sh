@@ -16,6 +16,9 @@ echo "Starting build. - ${BASH_SOURCE[0]}"
 # environment
 NPM_ROOT="$(npm run env | grep '^PWD' | cut -d '=' -f '2')"
 pushd "$NPM_ROOT"
+ee node --version
+ee yarn --version
+ee npm --version
 NODE_MAJOR_VERSION="$(node --version | tr -d 'v' | cut -d '.' -f '1')"
 # package info
 PACKAGE_NAME="$(cat package.json | jq -r '.name')"

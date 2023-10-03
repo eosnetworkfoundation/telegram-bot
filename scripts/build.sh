@@ -42,6 +42,7 @@ elif [[ -n "$GITHUB_ACTOR" ]]; then
 else
     export ACTOR="$USER@$HOSTNAME"
 fi
+[[ -z "$GITHUB_ACTIONS" ]] && export GITHUB_ACTIONS='false'
 # verify tag matches package.json version, if it exists
 if [[ -n "$GIT_TAG" && "$GIT_TAG" != "v$PACKAGE_VERSION" ]]; then
     printf '\e[1;31mERROR: The git tag does not match the package.json version!\e[0m\n'
@@ -61,10 +62,12 @@ echo 'Adding git metadata to package.json.'
 ee "mv package.json package.json.$UNIX_TIME.bak"
 cat package.json.$UNIX_TIME.bak | jq \
     --arg branch "$GIT_BRANCH" \
+    --argjson is_gh_action "$GITHUB_ACTIONS" \
     --arg tag "$GIT_TAG" \
     '.git += {
         actor: env.ACTOR,
         branch: (if $branch == "" then null else $branch end),
+        build: (if $is_gh_action then (env.GITHUB_RUN_NUMBER | tonumber) else "local" end),
         commit: env.GIT_COMMIT,
         short_commit: env.GIT_SHORT_COMMIT,
         tag: (if $tag == "" then null else $tag end)

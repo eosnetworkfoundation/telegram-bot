@@ -171,7 +171,7 @@ let _tz;
 Object.defineProperty(this, 'timezone', {
     get: () => {
         if (is.nullOrEmpty(_tz)) {
-            const tz = accessEnv('TZ');
+            const tz = accessEnv('TIMEZONE');
             if (is.nullOrEmpty(tz) || tz === '[]') {
                 _tz = ['UTC'];
             } else {

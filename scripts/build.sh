@@ -54,13 +54,12 @@ echo 'Adding git metadata to package.json.'
 ee "mv package.json package.json.$UNIX_TIME.bak"
 cat package.json.$UNIX_TIME.bak | jq \
     --arg branch "$GIT_BRANCH" \
-    --arg commit "$GIT_COMMIT" \
     --arg short "$GIT_SHORT_COMMIT" \
     --arg tag "$GIT_TAG" \
     '.git += {
         actor: env.ACTOR,
         branch: (if $branch == "" then null else $branch end),
-        commit: $commit,
+        commit: env.GIT_COMMIT,
         short_commit: $short,
         tag: (if $tag == "" then null else $tag end)
     }' > package.json

@@ -54,13 +54,12 @@ echo 'Adding git metadata to package.json.'
 ee "mv package.json package.json.$UNIX_TIME.bak"
 cat package.json.$UNIX_TIME.bak | jq \
     --arg branch "$GIT_BRANCH" \
-    --arg short "$GIT_SHORT_COMMIT" \
     --arg tag "$GIT_TAG" \
     '.git += {
         actor: env.ACTOR,
         branch: (if $branch == "" then null else $branch end),
         commit: env.GIT_COMMIT,
-        short_commit: $short,
+        short_commit: env.GIT_SHORT_COMMIT,
         tag: (if $tag == "" then null else $tag end)
     }' > package.json
 # install dependencies, but not dev dependencies

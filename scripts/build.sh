@@ -63,12 +63,14 @@ ee "mv package.json package.json.$UNIX_TIME.bak"
 cat package.json.$UNIX_TIME.bak | jq \
     --arg branch "$GIT_BRANCH" \
     --argjson is_gh_action "$GITHUB_ACTIONS" \
+    --arg node_version "$(node --version)" \
     --arg tag "$GIT_TAG" \
     '.git += {
         actor: env.ACTOR,
         branch: (if $branch == "" then null else $branch end),
         build: (if $is_gh_action then (env.GITHUB_RUN_NUMBER | tonumber) else "local" end),
         build_id: (if $is_gh_action then (env.GITHUB_RUN_ID | tonumber) else null end),
+        build_node_version: $node_version,
         build_url: (if $is_gh_action then (env.GITHUB_SERVER_URL + "/" + env.GITHUB_REPOSITORY + "/actions/runs/" + env.GITHUB_RUN_ID) else null end),
         commit: env.GIT_COMMIT,
         short_commit: env.GIT_SHORT_COMMIT,

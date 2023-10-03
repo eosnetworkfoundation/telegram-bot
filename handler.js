@@ -56,10 +56,10 @@ const accessEnv = (key, secret = true) => {
     return value;
 };
 
-// determine if an SNS message came from an SNS topic used for testing
-const isDevSnsTopic = (message) => {
+// determine if an SNS event came from an SNS topic used for testing
+const isDevSnsTopic = (event) => {
     const testArn = accessEnv('DEV_EVENT_SOURCE_ARN');
-    return !is.nullOrEmpty(testArn) && (testArn.includes(message.TopicArn) || testArn.includes('*'));
+    return !is.nullOrEmpty(testArn) && (testArn.includes(event.TopicArn) || testArn.includes('*'));
 };
 
 // parse alarm state reasonData
@@ -295,7 +295,7 @@ module.exports.handler = async (event) => {
     joi.assert(message, cloudwatchEventSchema, 'SNS message failed joi schema validation!');
     message = parseReasonData(message);
     // send message to Telegram
-    const response = await pushTelegramMsg(this.formatCloudwatchEvent(message), isDevSnsTopic(message) ? this.chatIdDev : this.chatIdCustomer);
+    const response = await pushTelegramMsg(this.formatCloudwatchEvent(message), isDevSnsTopic(event) ? this.chatIdDev : this.chatIdCustomer);
     // construct useful data to return
     const rawResult = {
         input: event,

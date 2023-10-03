@@ -274,6 +274,7 @@ module.exports.formatCloudwatchEvent = (message) => {
     const intro = `The <code>${message.detail.alarmName}</code> alarm is ${state}!`;
     const description = parseInlineCode(enc(message.detail.configuration.description));
     const reason = enc(message.detail.state.reason.replace(/ [(][^)]*[0-9]{2}\/[0-9]{2}\/[0-9]{2}[^)]*[)]/, '')); // remove ambiguous timestamp(s) from reason string
+    const tail = 'Please put eyes 👀 on this message if you are investigating this.';
     // print timestamp in timezones of interest
     const time = moment(message.detail.state.timestamp);
     let timestamp = 'Timestamp:\n<pre>';
@@ -282,7 +283,7 @@ module.exports.formatCloudwatchEvent = (message) => {
     }
     timestamp += '</pre>';
     // construct and return message
-    return `${head}\n${intro}\n\n${description}\n\nReason:<pre>${reason}</pre>\n${timestamp}`;
+    return `${head}\n${intro}\n\n${description}\n\nReason:<pre>${reason}</pre>\n${timestamp}\n${tail}`;
 };
 
 // handle SNS event

@@ -68,6 +68,7 @@ cat package.json.$UNIX_TIME.bak | jq \
         actor: env.ACTOR,
         branch: (if $branch == "" then null else $branch end),
         build: (if $is_gh_action then (env.GITHUB_RUN_NUMBER | tonumber) else "local" end),
+        build_id: (if $is_gh_action then (env.GITHUB_RUN_ID | tonumber) else null end),
         commit: env.GIT_COMMIT,
         short_commit: env.GIT_SHORT_COMMIT,
         tag: (if $tag == "" then null else $tag end)

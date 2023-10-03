@@ -26,6 +26,9 @@ PACKAGE_VERSION="$(cat package.json | jq -r '.version')"
 echo "Found package.json for \"$PACKAGE_NAME\" version \"$PACKAGE_VERSION\"."
 # git info
 export GIT_BRANCH="$(git branch --show-current)"
+if [[ -z "$GIT_BRANCH" ]]; then
+    export GIT_BRANCH="$(git branch --contains 'tags/v0.1.0' | tail -n +2 | tail -n 1 | tr -d '[:space:]')" # get branch containing tag
+fi
 export GIT_COMMIT="$(git rev-parse HEAD)"
 export GIT_SHORT_COMMIT="$(git rev-parse --short HEAD)"
 export GIT_TAG="$(git --no-pager tag --points-at HEAD)"

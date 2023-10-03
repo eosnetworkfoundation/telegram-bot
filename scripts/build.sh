@@ -51,7 +51,17 @@ fi
 # pack metadata into the package.json
 echo 'Adding git metadata to package.json.'
 ee "mv package.json package.json.$UNIX_TIME.bak"
-cat package.json.$UNIX_TIME.bak | jq --arg branch "$GIT_BRANCH" --arg commit "$GIT_COMMIT" --arg short "$GIT_SHORT_COMMIT" --arg tag "$GIT_TAG" '. + {git: {branch: $branch, commit: $commit, short_commit: $short, tag: (if $tag == "" then null else $tag end)}}' > package.json
+cat package.json.$UNIX_TIME.bak | jq \
+    --arg branch "$GIT_BRANCH" \
+    --arg commit "$GIT_COMMIT" \
+    --arg short "$GIT_SHORT_COMMIT" \
+    --arg tag "$GIT_TAG" \
+    '.git += {
+        branch: $branch,
+        commit: $commit,
+        short_commit: $short,
+        tag: (if $tag == "" then null else $tag end)
+    }' > package.json
 # install dependencies, but not dev dependencies
 echo 'Installing production dependencies...'
 ee 'yarn --prod --frozen-lockfile --non-interactive'

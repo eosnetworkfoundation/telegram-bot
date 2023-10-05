@@ -291,18 +291,8 @@ module.exports.main = async (event) => {
     joi.assert(message, cloudwatchEventSchema, 'SNS message failed joi schema validation!');
     // send message to Telegram
     const response = await pushTelegramMsg(this.formatCloudwatchEvent(message), isDevSnsTopic(event) ? this.chatIdDev : this.chatIdCustomer);
-    // construct useful data to return
-    const rawResult = {
-        input: event,
-        message,
-        output: {
-            data: response.data || null,
-            error: response.error || null,
-            status: response.status || null,
-        },
-    };
     // sanitize, print, and return result
-    const result = sanitize(JSON.stringify(rawResult, null, 4));
+    const result = sanitize(JSON.stringify(response, null, 4));
     console.log('Done.', result);
     return result;
 };

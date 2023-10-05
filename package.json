@@ -2,7 +2,7 @@
   "name": "telegram-bot",
   "version": "0.2.1",
   "description": "JavaScript project to deliver IM messages via Telegram using an Amazon Web Services (AWS) Lambda.",
-  "main": "handler.js",
+  "main": "index.js",
   "repository": "git@github.com:eosnetworkfoundation/telegram-bot.git",
   "homepage": "https://github.com/eosnetworkfoundation/telegram-bot",
   "author": {
@@ -19,7 +19,7 @@
     "test": "jest --coverage"
   },
   "files": [
-    "handler.js",
+    "index.js",
     "is.js"
   ],
   "dependencies": {

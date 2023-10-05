@@ -62,14 +62,6 @@ const isDevSnsTopic = (event) => {
     return !is.nullOrEmpty(testArn) && (testArn.includes(event.Records[0].Sns.TopicArn) || testArn.includes('*'));
 };
 
-// parse alarm state reasonData
-const parseReasonData = (message) => {
-    const output = message;
-    output.detail.previousState.reasonData = JSON.parse(message.detail.previousState.reasonData);
-    output.detail.state.reasonData = JSON.parse(message.detail.state.reasonData);
-    return output;
-};
-
 // extract SNS message contents from an SNS event
 const parseSnsMessage = (event) => {
     console.log('Parsing SNS message...');
@@ -295,9 +287,8 @@ module.exports.main = async (event) => {
     // validate event schema
     joi.assert(event, snsEventSchema, 'SNS event failed joi schema validation!');
     // parse and validate message contents
-    let message = parseSnsMessage(event);
+    const message = parseSnsMessage(event);
     joi.assert(message, cloudwatchEventSchema, 'SNS message failed joi schema validation!');
-    message = parseReasonData(message);
     // send message to Telegram
     const response = await pushTelegramMsg(this.formatCloudwatchEvent(message), isDevSnsTopic(event) ? this.chatIdDev : this.chatIdCustomer);
     // construct useful data to return

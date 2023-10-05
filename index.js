@@ -1,33 +1,9 @@
 const axios = require('axios');
 const is = require('./is.js');
 const joi = require('joi');
-const moment = require('moment-timezone');
 const pkg = require('./package.json');
 
-/* joi schema */
-// schema of a CloudWatch alarm state
-const cloudwatchAlarmStateSchema = joi.object({
-    reason: joi.string().required(),
-    reasonData: joi.string().required(),
-    timestamp: joi.string().isoDate().required(),
-    value: joi.string().valid('ALARM', 'OK', 'INSUFFICIENT_DATA').required(),
-}).unknown();
-
-// schema of an unpacked CloudWatch alarm state change event
-const cloudwatchEventSchema = joi.object({
-    account: joi.string().pattern(/^[0-9]+$/).required(),
-    detail: joi.object({
-        alarmName: joi.string().required(),
-        configuration: joi.object({
-            description: joi.string().allow(null).required(),
-        }).unknown().required(),
-        previousState: cloudwatchAlarmStateSchema.required(),
-        state: cloudwatchAlarmStateSchema.required(),
-    }).unknown().required(),
-    'detail-type': joi.string().valid('CloudWatch Alarm State Change').required(),
-    source: joi.string().valid('aws.cloudwatch').required(),
-}).unknown();
-
+/* schema */
 // schema of a single SNS event "record"
 const snsEventRecordSchema = joi.object({
     EventSource: joi.string().valid('aws:sns').required(),
@@ -60,30 +36,6 @@ const accessEnv = (key, secret = true) => {
 const isDevSnsTopic = (event) => {
     const testArn = accessEnv('DEV_EVENT_SOURCE_ARN');
     return !is.nullOrEmpty(testArn) && (testArn.includes(event.Records[0].Sns.TopicArn) || testArn.includes('*'));
-};
-
-// extract SNS message contents from an SNS event
-const parseSnsMessage = (event) => {
-    console.log('Parsing SNS message...');
-    let message;
-    const rawMessage = event.Records[0].Sns.Message;
-    if (is.nullOrEmpty(rawMessage)) {
-        console.log('SNS message is empty.');
-        message = rawMessage;
-    } else if (is.string(rawMessage)) {
-        try {
-            message = JSON.parse(rawMessage);
-            console.log('SNS message parsed as JSON.');
-        } catch (error) {
-            console.log('SNS message is a non-empty string that does not parse as JSON.');
-            message = rawMessage;
-        }
-    } else {
-        console.log('SNS message is not empty or a string.');
-        message = rawMessage;
-    }
-    console.log('Parsed SNS message.');
-    return message;
 };
 
 // scrub sensitive data from a string
@@ -190,9 +142,6 @@ const enc = (str) => {
     return str.replace(/[&<>]/g, char => replacements[char]);
 };
 
-// replace pairs of back-ticks with HTML code tags
-const parseInlineCode = str => str.replace(/`([^`]+)`/g, '<code>$1</code>');
-
 // send a Telegram message
 const pushTelegramMsg = async (message, chatId = this.chatId) => {
     console.log('Sending message to Telegram...');
@@ -248,49 +197,15 @@ module.exports.handler = async (event) => {
     return result;
 };
 
-// format SNS message for humans
-module.exports.formatCloudwatchEvent = (message) => {
-    let emoji;
-    let state;
-    let tail;
-    if (message.detail.state.value === 'ALARM') {
-        emoji = '❌';
-        state = 'triggered';
-        tail = 'Please put eyes 👀 on this message if you are investigating this.';
-    } else if (message.detail.state.value === 'OK') {
-        emoji = '✅';
-        state = 'resolved';
-        tail = 'Yaaaaay! 🎉';
-    } else {
-        emoji = '❔';
-        state = 'ambiguous';
-        tail = `Contact ${enc(this.maintainer)} if this does not resolve in ten minutes or so.`;
-    }
-    const head = `${emoji} <b>${message.detail.alarmName}</b> ${emoji}`;
-    const intro = `The <code>${message.detail.alarmName}</code> alarm is ${state}!`;
-    const description = parseInlineCode(enc(message.detail.configuration.description));
-    const reason = enc(message.detail.state.reason.replace(/ [(][^)]*[0-9]{2}\/[0-9]{2}\/[0-9]{2}[^)]*[)]/, '')); // remove ambiguous timestamp(s) from reason string
-    // print timestamp in timezones of interest
-    const time = moment(message.detail.state.timestamp);
-    let timestamp = 'Timestamp:\n<pre>';
-    for (let i = 0; i < this.timezone.length; i++) {
-        timestamp += `${time.tz(this.timezone[i]).format('YYYY-MM-DD HH:mm:ss.SSS z')}\n`;
-    }
-    timestamp += '</pre>';
-    // construct and return message
-    return `${head}\n${intro} ${description}\n\nReason:<pre>${reason}</pre>\n${timestamp}\n${tail}`;
-};
-
 // handle SNS event
 module.exports.main = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
     // validate event schema
     joi.assert(event, snsEventSchema, 'SNS event failed joi schema validation!');
     // parse and validate message contents
-    const message = parseSnsMessage(event);
-    joi.assert(message, cloudwatchEventSchema, 'SNS message failed joi schema validation!');
+    const message = event.Records[0].Sns.Message;
     // send message to Telegram
-    const response = await pushTelegramMsg(this.formatCloudwatchEvent(message), isDevSnsTopic(event) ? this.chatIdDev : this.chatIdCustomer);
+    const response = await pushTelegramMsg(message, isDevSnsTopic(event) ? this.chatIdDev : this.chatIdCustomer);
     // sanitize, print, and return result
     const result = sanitize(JSON.stringify(response, null, 4));
     console.log('Done.', result);

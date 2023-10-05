@@ -50,16 +50,15 @@ const sanitize = (str) => str
 /* globals */
 // telegram API integration
 let _api;
-let _apiKey;
 Object.defineProperty(this, 'api', {
     get: () => {
         if (is.nullOrEmpty(_api)) {
-            _apiKey = accessEnv('TELEGRAM_API_KEY', true);
-            if (is.nullOrEmpty(_apiKey)) {
+            const apiKey = accessEnv('TELEGRAM_API_KEY', true);
+            if (is.nullOrEmpty(apiKey)) {
                 throw new Error('TELEGRAM_API_KEY is not defined in the environment!');
             }
             _api = axios.create({
-                baseURL: `https://api.telegram.org/bot${_apiKey}/sendMessage`,
+                baseURL: `https://api.telegram.org/bot${apiKey}/sendMessage`,
             });
         }
         return _api;

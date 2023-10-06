@@ -125,26 +125,6 @@ const enc = (str) => {
     return str.replace(/[&<>]/g, char => replacements[char]);
 };
 
-// send a Telegram message
-const pushTelegramMsg = async (message, chatId = this.chatId) => {
-    console.log('Sending message to Telegram...');
-    const response = await this.api.get('', {
-        params: {
-            chat_id: chatId,
-            disable_web_page_preview: true,
-            parse_mode: 'HTML',
-            text: sanitize(message),
-        },
-    });
-    if (response.status >= 300) {
-        const msg = `Telegram returned an unexpected ${response.status} HTTP status code.`;
-        console.error(`ERROR: ${msg}`, sanitize(response.data.toString()));
-        throw new Error(msg);
-    }
-    console.log('Telegram message sent.');
-    return response;
-};
-
 /* entrypoint */
 module.exports.handler = async (event) => {
     const result = {
@@ -159,7 +139,7 @@ module.exports.handler = async (event) => {
         console.error(sanitize(`FATAL: ${error.message}`), sanitize(error.toString()));
         try {
             const notification = this.notificationFromError(error);
-            await pushTelegramMsg(notification, this.chatIdOwner || this.chatId);
+            await this.pushTelegramMsg(notification, this.chatIdOwner || this.chatId);
         } catch (err) {
             console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', sanitize(err.toString()));
         }
@@ -175,7 +155,7 @@ module.exports.main = async (event) => {
     // parse and validate message contents
     const message = event.Records[0].Sns.Message;
     // send message to Telegram
-    const response = await pushTelegramMsg(message, isDevSnsTopic(event) ? this.chatIdDev : this.chatIdCustomer);
+    const response = await this.pushTelegramMsg(message, isDevSnsTopic(event) ? this.chatIdDev : this.chatIdCustomer);
     // sanitize, print, and return result
     const result = sanitize(JSON.stringify(response, null, 4));
     console.log('Done.', result);
@@ -199,4 +179,24 @@ module.exports.notificationFromError = (error) => {
     const tail = `Please contact ${enc(this.maintainer)} if you see this message.`;
     // join message parts
     return `${head}\n${intro}\n\n${stack}\n\n${logs}\n\n${tail}`;
+};
+
+// send a Telegram message
+module.exports.pushTelegramMsg = async (message, chatId = this.chatId) => {
+    console.log('Sending message to Telegram...');
+    const response = await this.api.get('', {
+        params: {
+            chat_id: chatId,
+            disable_web_page_preview: true,
+            parse_mode: 'HTML',
+            text: sanitize(message),
+        },
+    });
+    if (response.status >= 300) {
+        const msg = `Telegram returned an unexpected ${response.status} HTTP status code.`;
+        console.error(`ERROR: ${msg}`, sanitize(response.data.toString()));
+        throw new Error(msg);
+    }
+    console.log('Telegram message sent.');
+    return response;
 };

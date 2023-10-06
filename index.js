@@ -118,7 +118,7 @@ module.exports.main = async (event) => {
     // parse and validate message contents
     const message = event.Records[0].Sns.Message;
     // send message to Telegram
-    const response = await this.pushTelegramMsg(message, this.sourceIsDevArn(event) ? this.chatIdDev : this.chatIdCustomer);
+    const response = await this.pushTelegramMsg(message, this.sourceIsTestingArn(event) ? this.chatIdDev : this.chatIdCustomer);
     // sanitize, print, and return result
     const result = JSON.parse(this.removeSecrets(JSON.stringify(response, null, 4)));
     console.log('Done.', result);
@@ -201,7 +201,7 @@ module.exports.removeSecrets = (str) => str
     /* eslint-enable no-template-curly-in-string */ // eslint-disable-line indent
 
 // determine if an SNS event came from an SNS topic used for testing
-module.exports.sourceIsDevArn = (event) => {
+module.exports.sourceIsTestingArn = (event) => {
     const testArnStr = this.readEnv('TEST_EVENT_SOURCE_ARN', true);
     if (is.nullOrEmpty(testArnStr) || testArnStr.trim() === '[]') {
         return false;

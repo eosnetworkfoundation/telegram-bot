@@ -20,13 +20,6 @@ const snsEventSchema = joi.object({
     Records: joi.array().items(snsEventRecordSchema).min(1).required(),
 }).unknown();
 
-/* functions */
-// determine if an SNS event came from an SNS topic used for testing
-const isDevSnsTopic = (event) => {
-    const testArn = this.readEnv('DEV_EVENT_SOURCE_ARN', true);
-    return !is.nullOrEmpty(testArn) && (testArn.includes(event.Records[0].Sns.TopicArn) || testArn.includes('*'));
-};
-
 /* globals */
 // telegram API integration
 let _api;
@@ -128,6 +121,12 @@ module.exports.handler = async (event) => {
     return result;
 };
 
+// determine if an SNS event came from an SNS topic used for testing
+module.exports.isDevSnsTopic = (event) => {
+    const testArn = this.readEnv('DEV_EVENT_SOURCE_ARN', true);
+    return !is.nullOrEmpty(testArn) && (testArn.includes(event.Records[0].Sns.TopicArn) || testArn.includes('*'));
+};
+
 // handle SNS event
 module.exports.main = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
@@ -136,7 +135,7 @@ module.exports.main = async (event) => {
     // parse and validate message contents
     const message = event.Records[0].Sns.Message;
     // send message to Telegram
-    const response = await this.pushTelegramMsg(message, isDevSnsTopic(event) ? this.chatIdDev : this.chatIdCustomer);
+    const response = await this.pushTelegramMsg(message, this.isDevSnsTopic(event) ? this.chatIdDev : this.chatIdCustomer);
     // sanitize, print, and return result
     const result = this.sanitize(JSON.stringify(response, null, 4));
     console.log('Done.', result);

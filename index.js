@@ -153,13 +153,16 @@ module.exports.notificationFromError = (error) => {
 
 // send a Telegram message
 module.exports.pushTelegramMsg = async (message, chatId = this.chatId) => {
+    const noSecrets = this.removeSecrets(message);
+    const noHtml = this.removeHtmlControlChars(noSecrets);
+    const text = this.markdownToHtml(noHtml);
     console.log('Sending message to Telegram...');
     const response = await this.api.get('', {
         params: {
             chat_id: chatId,
             disable_web_page_preview: true,
             parse_mode: 'HTML',
-            text: this.removeSecrets(message),
+            text,
         },
     });
     if (response.status >= 300) {

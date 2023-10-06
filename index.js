@@ -120,7 +120,7 @@ module.exports.main = async (event) => {
     // send message to Telegram
     const response = await this.pushTelegramMsg(message, this.sourceIsDevArn(event) ? this.chatIdDev : this.chatIdCustomer);
     // sanitize, print, and return result
-    const result = this.removeSecrets(JSON.stringify(response, null, 4));
+    const result = JSON.parse(this.removeSecrets(JSON.stringify(response, null, 4)));
     console.log('Done.', result);
     return result;
 };

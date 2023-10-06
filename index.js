@@ -21,20 +21,9 @@ const snsEventSchema = joi.object({
 }).unknown();
 
 /* functions */
-// read an environment variable and log the status
-const accessEnv = (key, secret = true) => {
-    const value = process.env[key];
-    if (is.nullOrEmpty(value)) {
-        console.warn(`WARNING: ${key} is not defined in the environment!`);
-    } else {
-        console.log(`Read ${value.length} char ${key}${secret ? '' : ` ("${value.slice(0, 2)}...${value.slice(-4)}")`} from the environment.`);
-    }
-    return value;
-};
-
 // determine if an SNS event came from an SNS topic used for testing
 const isDevSnsTopic = (event) => {
-    const testArn = accessEnv('DEV_EVENT_SOURCE_ARN');
+    const testArn = this.readEnv('DEV_EVENT_SOURCE_ARN');
     return !is.nullOrEmpty(testArn) && (testArn.includes(event.Records[0].Sns.TopicArn) || testArn.includes('*'));
 };
 
@@ -53,7 +42,7 @@ let _api;
 Object.defineProperty(this, 'api', {
     get: () => {
         if (is.nullOrEmpty(_api)) {
-            const apiKey = accessEnv('TELEGRAM_API_KEY', true);
+            const apiKey = this.readEnv('TELEGRAM_API_KEY', true);
             if (is.nullOrEmpty(apiKey)) {
                 throw new Error('TELEGRAM_API_KEY is not defined in the environment!');
             }
@@ -70,7 +59,7 @@ let _chatIdCustomer;
 Object.defineProperty(this, 'chatIdCustomer', {
     get: () => {
         if (is.nullOrEmpty(_chatIdCustomer)) {
-            _chatIdCustomer = accessEnv('TELEGRAM_CHAT_ID', false);
+            _chatIdCustomer = this.readEnv('TELEGRAM_CHAT_ID', false);
             if (is.nullOrEmpty(_chatIdCustomer)) {
                 throw new Error('TELEGRAM_CHAT_ID is not defined in the environment!');
             }
@@ -81,12 +70,12 @@ Object.defineProperty(this, 'chatIdCustomer', {
 
 // telegram chat ID for test notifications
 Object.defineProperty(this, 'chatIdDev', {
-    get: () => accessEnv('TELEGRAM_CHAT_ID_DEV', false),
+    get: () => this.readEnv('TELEGRAM_CHAT_ID_DEV', false),
 });
 
 // telegram chat ID for alerts to the bot owner/maintainer
 Object.defineProperty(this, 'chatIdOwner', {
-    get: () => accessEnv('TELEGRAM_CHAT_ID_OWNER', false),
+    get: () => this.readEnv('TELEGRAM_CHAT_ID_OWNER', false),
 });
 
 // return the log URI
@@ -101,7 +90,7 @@ Object.defineProperty(this, 'logUri', {
 
 // name or contact info for the bot maintainer
 Object.defineProperty(this, 'maintainer', {
-    get: () => accessEnv('MAINTAINER'),
+    get: () => this.readEnv('MAINTAINER'),
 });
 
 // return the package name
@@ -198,4 +187,15 @@ module.exports.pushTelegramMsg = async (message, chatId = this.chatId) => {
     }
     console.log('Telegram message sent.');
     return response;
+};
+
+// read an environment variable and log the status without disclosing secrets
+module.exports.readEnv = (key, secret = true) => {
+    const value = process.env[key];
+    if (is.nullOrEmpty(value)) {
+        console.warn(`WARNING: ${key} is not defined in the environment!`);
+    } else {
+        console.log(`Read ${value.length} char ${key}${secret ? '' : ` ("${value.slice(0, 2)}...${value.slice(-4)}")`} from the environment.`);
+    }
+    return value;
 };

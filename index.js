@@ -164,14 +164,7 @@ const pushTelegramMsg = async (message, chatId = this.chatId) => {
 // send an error message to Telegram
 const pushTelegramMsgErr = (err) => {
     try {
-        const head = `❗ <b>${process.env.AWS_LAMBDA_FUNCTION_NAME}</b> ❗`;
-        const gh = `<a href="${pkg.homepage}/tree/${this.version}">${enc(this.name)}:${pkg.git.tag || pkg.git.short_commit}</a>${(is.nullOrEmpty(pkg.git.tag)) ? ` from <code>${enc(pkg.git.branch)}</code>` : ''}`;
-        const intro = `The <code>${process.env.AWS_LAMBDA_FUNCTION_NAME}</code> lambda running ${gh} just threw the following error:`;
-        const stack = `<pre>${enc(err.stack)}</pre>`;
-        const logs = `&gt;&gt; <a href="${this.logUri}">CloudWatch Logs</a> &lt;&lt;`;
-        const tail = `Please contact ${enc(this.maintainer)} if you see this message.`;
-        // join message parts
-        const msg = `${head}\n${intro}\n\n${stack}\n\n${logs}\n\n${tail}`;
+        const msg = this.notificationFromError(err);
         return pushTelegramMsg(msg, this.chatIdOwner || this.chatId);
     } catch (error) {
         console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', sanitize(error.toString())); // we do not propagate this error because there is a higher error we want to alert on
@@ -217,3 +210,15 @@ module.exports.markdownToHtml = (markdown) => markdown
     .replace(/(?<!`)`([^`]+)`(?!`)/g, '<code>$1</code>') // inline code
     .replace(/(?<!\*)[*]{2}([^*]+)[*]{2}(?!\*)/g, '<b>$1</b>') // bold
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>'); // hyperlinks
+
+// return a human-friendly notification body from a nodeJS error
+module.exports.notificationFromError = (error) => {
+    const head = `❗ <b>${process.env.AWS_LAMBDA_FUNCTION_NAME}</b> ❗`;
+    const gh = `<a href="${pkg.homepage}/tree/${this.version}">${enc(this.name)}:${pkg.git.tag || pkg.git.short_commit}</a>${(is.nullOrEmpty(pkg.git.tag)) ? ` from <code>${enc(pkg.git.branch)}</code>` : ''}`;
+    const intro = `The <code>${process.env.AWS_LAMBDA_FUNCTION_NAME}</code> lambda running ${gh} just threw the following error:`;
+    const stack = `<pre>${enc(error.stack)}</pre>`;
+    const logs = `&gt;&gt; <a href="${this.logUri}">CloudWatch Logs</a> &lt;&lt;`;
+    const tail = `Please contact ${enc(this.maintainer)} if you see this message.`;
+    // join message parts
+    return `${head}\n${intro}\n\n${stack}\n\n${logs}\n\n${tail}`;
+};

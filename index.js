@@ -193,9 +193,7 @@ module.exports.pushTelegramMsg = async (message, chatId = this.chatId) => {
         },
     });
     if (response.status >= 300) {
-        const msg = `Telegram returned an unexpected ${response.status} HTTP status code.`;
-        console.error(`ERROR: ${msg}`, sanitize(response.data.toString()));
-        throw new Error(msg);
+        throw new Error(`Telegram returned an unexpected ${response.status} HTTP status code.`);
     }
     console.log('Telegram message sent.');
     return response;

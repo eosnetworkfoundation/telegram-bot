@@ -110,12 +110,6 @@ module.exports.handler = async (event) => {
     return result;
 };
 
-// determine if an SNS event came from an SNS topic used for testing
-module.exports.isDevSnsTopic = (event) => {
-    const testArn = this.readEnv('DEV_EVENT_SOURCE_ARN', true);
-    return !is.nullOrEmpty(testArn) && (testArn.includes(event.Records[0].Sns.TopicArn) || testArn.includes('*'));
-};
-
 // handle SNS event
 module.exports.main = async (event) => {
     console.log('Received event:', JSON.stringify(event, null, 4));
@@ -124,7 +118,7 @@ module.exports.main = async (event) => {
     // parse and validate message contents
     const message = event.Records[0].Sns.Message;
     // send message to Telegram
-    const response = await this.pushTelegramMsg(message, this.isDevSnsTopic(event) ? this.chatIdDev : this.chatIdCustomer);
+    const response = await this.pushTelegramMsg(message, this.sourceIsDevArn(event) ? this.chatIdDev : this.chatIdCustomer);
     // sanitize, print, and return result
     const result = this.removeSecrets(JSON.stringify(response, null, 4));
     console.log('Done.', result);
@@ -205,3 +199,9 @@ module.exports.removeSecrets = (str) => str
     .replace(new RegExp(process.env.TELEGRAM_CHAT_ID_DEV, 'g'), '${TELEGRAM_CHAT_ID_DEV}')
     .replace(new RegExp(process.env.TELEGRAM_CHAT_ID_OWNER, 'g'), '${TELEGRAM_CHAT_ID_OWNER}');
     /* eslint-enable no-template-curly-in-string */ // eslint-disable-line indent
+
+// determine if an SNS event came from an SNS topic used for testing
+module.exports.sourceIsDevArn = (event) => {
+    const testArn = this.readEnv('DEV_EVENT_SOURCE_ARN', true);
+    return !is.nullOrEmpty(testArn) && (testArn.includes(event.Records[0].Sns.TopicArn) || testArn.includes('*'));
+};

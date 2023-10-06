@@ -87,17 +87,6 @@ Object.defineProperty(this, 'version', {
     get: () => ((is.nullOrEmpty(pkg.git.tag)) ? pkg.git.commit : pkg.git.tag),
 });
 
-/* telegram */
-// take a string and replace HTML characters with escape sequences as required for Telegram
-const enc = (str) => {
-    const replacements = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-    };
-    return str.replace(/[&<>]/g, char => replacements[char]);
-};
-
 /* functions */
 // lambda entrypoint; try to catch, log, and notify on error
 module.exports.handler = async (event) => {
@@ -193,6 +182,16 @@ module.exports.readEnv = (key, writeToLog) => {
         console.log(`Read "${key}" with ${value.length} char from the environment.`);
     }
     return value;
+};
+
+// take a string and replace HTML characters with escape sequences as required for Telegram
+module.exports.removeHtmlControlChars = (str) => {
+    const replacements = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+    };
+    return str.replace(/[&<>]/g, char => replacements[char]);
 };
 
 // try to remove secrets from a string

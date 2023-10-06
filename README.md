@@ -149,7 +149,10 @@ This lambda has three primary outputs:
     - Notifications about runtime errors intended for the maintainer.
 1. Logs in CloudWatch.
 1. Return value, a JSON object with this schema:
-    - **body** - data from the Telegram API response.
+    - **body**:
+        - **data** - data from the Telegram API response.
+        - **error** - any error encountered during the Telegram request.
+        - **status** - HTTP status of the Telegram response.
     - **statusCode** - HTTP response for the lambda as a whole.
 
 The lambda makes a good-faith attempt to sanitize secrets from Telegram message contents and log output, but it is ultimately the responsibility of the bot operator to ensure secrets are not leaked.

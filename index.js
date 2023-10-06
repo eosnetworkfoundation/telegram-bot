@@ -145,12 +145,11 @@ module.exports.handler = async (event) => {
 
 // handle SNS event
 module.exports.main = async (event) => {
-    console.log('Received event:', JSON.stringify(event, null, 4));
     // validate event schema
+    console.log('Received event:', JSON.stringify(event, null, 4));
     joi.assert(event, snsEventSchema, 'SNS event failed joi schema validation!');
-    // parse and validate message contents
-    const message = event.Records[0].Sns.Message;
     // send message to Telegram
+    const message = event.Records[0].Sns.Message;
     const response = await this.pushTelegramMsg(message, this.sourceIsTestingArn(event) ? this.chatIdDev : this.chatIdCustomer);
     // sanitize, print, and return result
     const result = this.removeSecrets(JSON.stringify({

@@ -4,6 +4,12 @@ const joi = require('joi');
 const pkg = require('./package.json');
 
 /* schema */
+// schema of an element in process.env.REPLACE
+const replacementSchema = joi.array().items(joi.string().required(), joi.string().required()).length(2).label('REPLACE array element');
+
+// schema of process.env.REPLACE
+const replacementsSchema = joi.array().items(replacementSchema).label('REPLACE array');
+
 // schema of a single SNS event "record"
 const snsEventRecordSchema = joi.object({
     EventSource: joi.string().valid('aws:sns').required(),
@@ -80,6 +86,32 @@ Object.defineProperty(this, 'maintainer', {
 // return the package name
 Object.defineProperty(this, 'name', {
     get: () => pkg.name,
+});
+
+// return an array of string replacements to make before sending a message or writing to logs
+let _replacements = [];
+Object.defineProperty(this, 'replacements', {
+    get: () => {
+        if (is.nullOrEmpty(_replacements)) {
+            const secrets = [
+                /* eslint-disable no-template-curly-in-string */
+                [process.env.TELEGRAM_API_KEY, '${TELEGRAM_API_KEY}'],
+                [process.env.TELEGRAM_CHAT_ID, '${TELEGRAM_CHAT_ID}'],
+                [process.env.TELEGRAM_CHAT_ID_DEV, '${TELEGRAM_CHAT_ID_DEV}'],
+                [process.env.TELEGRAM_CHAT_ID_OWNER, '${TELEGRAM_CHAT_ID_OWNER}'],
+                /* eslint-enable no-template-curly-in-string */
+            ];
+            const userReplacementStr = this.readEnv('REPLACE', true);
+            if (is.nullOrEmpty(userReplacementStr) || userReplacementStr.trim() === '[]') {
+                _replacements = secrets;
+            } else {
+                const userReplacements = JSON.parse(userReplacementStr);
+                joi.assert(userReplacements, replacementsSchema, 'REPLACE failed joi schema validation!');
+                _replacements = secrets.concat(userReplacements);
+            }
+        }
+        return _replacements;
+    },
 });
 
 // return the git version of this build
@@ -192,13 +224,13 @@ module.exports.removeHtmlControlChars = (str) => {
 };
 
 // try to remove secrets from a string
-module.exports.removeSecrets = (str) => str
-    /* eslint-disable no-template-curly-in-string */
-    .replace(new RegExp(process.env.TELEGRAM_API_KEY, 'g'), '${TELEGRAM_API_KEY}')
-    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID, 'g'), '${TELEGRAM_CHAT_ID}')
-    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID_DEV, 'g'), '${TELEGRAM_CHAT_ID_DEV}')
-    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID_OWNER, 'g'), '${TELEGRAM_CHAT_ID_OWNER}');
-    /* eslint-enable no-template-curly-in-string */ // eslint-disable-line indent
+module.exports.removeSecrets = (str) => {
+    let result = str;
+    this.replacements.forEach((replacement) => {
+        result = result.replace(replacement[0], replacement[1]);
+    });
+    return result;
+};
 
 // determine if an SNS event came from an SNS topic used for testing
 module.exports.sourceIsTestingArn = (event) => {

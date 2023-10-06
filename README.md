@@ -99,6 +99,7 @@ Key | Usage | Type | Description
 `AWS_LAMBDA_LOG_STREAM_NAME` | [AWS Intrinsic](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime) | String | Used to link maintainer to CloudWatch logs on error.
 `AWS_REGION` | [AWS Intrinsic](https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html#configuration-envvars-runtime) | String | Used to link maintainer to CloudWatch logs on error.
 `MAINTAINER` | Optional | String | Name or contact info for the bot maintainer.
+`REPLACE` | Optional | 2D JSON string array where, for each top-level element, the first string is replaced with the second when sanitizing strings.
 `TELEGRAM_API_KEY` | Required | String | The API key for the Telegram bot.
 `TELEGRAM_CHAT_ID` | Required | String | Telegram chat ID for customer-facing notifications.
 `TELEGRAM_CHAT_ID_DEV` | Optional | String | Telegram chat ID for test notifications.

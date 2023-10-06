@@ -125,7 +125,8 @@ const enc = (str) => {
     return str.replace(/[&<>]/g, char => replacements[char]);
 };
 
-/* entrypoint */
+/* functions */
+// lambda entrypoint; try to catch, log, and notify on error
 module.exports.handler = async (event) => {
     const result = {
         statusCode: 500,

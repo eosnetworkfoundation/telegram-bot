@@ -83,8 +83,8 @@ See the pipeline documentation for more information.
 
 ## Inputs
 This lambda receives two primary inputs:
-1. AWS Simple Notification Service (SNS) event payloads delivered by AWS.
-1. User-defined environment variables to configure the script.
+1. User-defined environment variables to configure lambda behavior.
+1. AWS Simple Notification Service (SNS) event payloads delivered by AWS, where the `message` field contains a string to be delivered (almost) verbatim as a Telegram notification.
 
 Special attention should be paid to your lambda function name(s), alarm name(s), and alarm description(s). The resource name is the only real identifier sent to the maintainer or the customer to determine where an error message is coming from, and the alarm description is included verbatim in the message body. Your resource names need to be unique enough to globally identify these resources, especially if you have multiple AWS accounts. The alarm description should be something useful. For example, to copy the AWS example below, "This alarm triggers when the US datacenter API server CPU utilization is above 50% for five minutes."
 

@@ -109,22 +109,6 @@ Object.defineProperty(this, 'name', {
     get: () => pkg.name,
 });
 
-// return timezones of interest
-let _tz;
-Object.defineProperty(this, 'timezone', {
-    get: () => {
-        if (is.nullOrEmpty(_tz)) {
-            const tz = accessEnv('TIMEZONE');
-            if (is.nullOrEmpty(tz) || tz === '[]') {
-                _tz = ['UTC'];
-            } else {
-                _tz = JSON.parse(tz);
-            }
-        }
-        return _tz;
-    },
-});
-
 // return the git version of this build
 Object.defineProperty(this, 'version', {
     get: () => ((is.nullOrEmpty(pkg.git.tag)) ? pkg.git.commit : pkg.git.tag),

@@ -210,3 +210,10 @@ module.exports.main = async (event) => {
     console.log('Done.', result);
     return result;
 };
+
+// convert a markdown string to HTML
+module.exports.markdownToHtml = (markdown) => markdown
+    .replace(/(`{3,})(?:\n*)((?:(?!\1)[\s\S])+?)(?:\n*)\1/g, '<pre>$2</pre>') // code blocks
+    .replace(/(?<!`)`([^`]+)`(?!`)/g, '<code>$1</code>') // inline code
+    .replace(/(?<!\*)[*]{2}([^*]+)[*]{2}(?!\*)/g, '<b>$1</b>') // bold
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>'); // hyperlinks

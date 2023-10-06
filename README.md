@@ -75,7 +75,7 @@ The output of `yarn pack` is **_not_** compatible with AWS. AWS requires the dep
 
 ## CI
 This repo contains the following GitHub Actions workflow for continuous integration (CI):
-- telegram-bot CI - lint, test, and build the `telegram-bot` project.
+- **telegram-bot CI** - lint, test, and build the `telegram-bot` project.
     - [Pipeline](https://github.com/eosnetworkfoundation/telegram-bot/actions/workflows/ci.yml)
     - [Documentation](./.github/workflows/ci.md)
 

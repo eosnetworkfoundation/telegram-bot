@@ -202,7 +202,7 @@ module.exports.removeSecrets = (str) => str
 
 // determine if an SNS event came from an SNS topic used for testing
 module.exports.sourceIsDevArn = (event) => {
-    const testArnStr = this.readEnv('DEV_EVENT_SOURCE_ARN', true);
+    const testArnStr = this.readEnv('TEST_EVENT_SOURCE_ARN', true);
     if (is.nullOrEmpty(testArnStr) || testArnStr.trim() === '[]') {
         return false;
     }
@@ -211,7 +211,7 @@ module.exports.sourceIsDevArn = (event) => {
     try {
         testArnArray = JSON.parse(testArnStr);
     } catch (error) {
-        console.error('ERROR: DEV_EVENT_SOURCE_ARN is not a valid JSON array!', testArnStr);
+        console.error('ERROR: TEST_EVENT_SOURCE_ARN is not a valid JSON array!', testArnStr);
         return (testArnStr === eventArn);
     }
     return (testArnArray.includes(eventArn) || testArnArray.includes('*'));

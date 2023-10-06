@@ -27,15 +27,6 @@ const isDevSnsTopic = (event) => {
     return !is.nullOrEmpty(testArn) && (testArn.includes(event.Records[0].Sns.TopicArn) || testArn.includes('*'));
 };
 
-// scrub sensitive data from a string
-const sanitize = (str) => str
-    /* eslint-disable no-template-curly-in-string */
-    .replace(new RegExp(process.env.TELEGRAM_API_KEY, 'g'), '${TELEGRAM_API_KEY}')
-    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID, 'g'), '${TELEGRAM_CHAT_ID}')
-    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID_DEV, 'g'), '${TELEGRAM_CHAT_ID_DEV}')
-    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID_OWNER, 'g'), '${TELEGRAM_CHAT_ID_OWNER}');
-    /* eslint-enable no-template-curly-in-string */
-
 /* globals */
 // telegram API integration
 let _api;
@@ -126,12 +117,12 @@ module.exports.handler = async (event) => {
         result.statusCode = 200;
     } catch (error) {
         result.body = error;
-        console.error(sanitize(`FATAL: ${error.message}`), sanitize(error.toString()));
+        console.error(this.sanitize(`FATAL: ${error.message}`), this.sanitize(error.toString()));
         try {
             const notification = this.notificationFromError(error);
             await this.pushTelegramMsg(notification, this.chatIdOwner || this.chatId);
         } catch (err) {
-            console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', sanitize(err.toString()));
+            console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', this.sanitize(err.toString()));
         }
     }
     return result;
@@ -147,7 +138,7 @@ module.exports.main = async (event) => {
     // send message to Telegram
     const response = await this.pushTelegramMsg(message, isDevSnsTopic(event) ? this.chatIdDev : this.chatIdCustomer);
     // sanitize, print, and return result
-    const result = sanitize(JSON.stringify(response, null, 4));
+    const result = this.sanitize(JSON.stringify(response, null, 4));
     console.log('Done.', result);
     return result;
 };
@@ -179,7 +170,7 @@ module.exports.pushTelegramMsg = async (message, chatId = this.chatId) => {
             chat_id: chatId,
             disable_web_page_preview: true,
             parse_mode: 'HTML',
-            text: sanitize(message),
+            text: this.sanitize(message),
         },
     });
     if (response.status >= 300) {
@@ -203,3 +194,12 @@ module.exports.readEnv = (key, writeToLog) => {
     }
     return value;
 };
+
+// try to remove secrets from a string
+module.exports.sanitize = (str) => str
+    /* eslint-disable no-template-curly-in-string */
+    .replace(new RegExp(process.env.TELEGRAM_API_KEY, 'g'), '${TELEGRAM_API_KEY}')
+    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID, 'g'), '${TELEGRAM_CHAT_ID}')
+    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID_DEV, 'g'), '${TELEGRAM_CHAT_ID_DEV}')
+    .replace(new RegExp(process.env.TELEGRAM_CHAT_ID_OWNER, 'g'), '${TELEGRAM_CHAT_ID_OWNER}');
+    /* eslint-enable no-template-curly-in-string */ // eslint-disable-line indent

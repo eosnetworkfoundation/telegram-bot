@@ -145,17 +145,6 @@ const pushTelegramMsg = async (message, chatId = this.chatId) => {
     return response;
 };
 
-// send an error message to Telegram
-const pushTelegramMsgErr = (err) => {
-    try {
-        const msg = this.notificationFromError(err);
-        return pushTelegramMsg(msg, this.chatIdOwner || this.chatId);
-    } catch (error) {
-        console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', sanitize(error.toString())); // we do not propagate this error because there is a higher error we want to alert on
-        return Promise.resolve();
-    }
-};
-
 /* entrypoint */
 module.exports.handler = async (event) => {
     const result = {
@@ -168,7 +157,12 @@ module.exports.handler = async (event) => {
     } catch (error) {
         result.body = error;
         console.error(sanitize(`FATAL: ${error.message}`), sanitize(error.toString()));
-        await pushTelegramMsgErr(error);
+        try {
+            const notification = this.notificationFromError(error);
+            await pushTelegramMsg(notification, this.chatIdOwner || this.chatId);
+        } catch (err) {
+            console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', sanitize(err.toString()));
+        }
     }
     return result;
 };

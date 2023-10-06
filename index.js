@@ -152,7 +152,8 @@ module.exports.markdownToHtml = (markdown) => markdown
 // return a human-friendly notification body from a nodeJS error
 module.exports.notificationFromError = (error) => {
     const head = `❗ <b>${process.env.AWS_LAMBDA_FUNCTION_NAME}</b> ❗`;
-    const gh = `<a href="${pkg.homepage}/tree/${this.version}">${enc(this.name)}:${pkg.git.tag || pkg.git.short_commit}</a>${(is.nullOrEmpty(pkg.git.tag)) ? ` from <code>${enc(pkg.git.branch)}</code>` : ''}`;
+    const branchString = (is.nullOrEmpty(pkg.git.tag)) ? ` from <code>${enc(pkg.git.branch)}</code>` : '';
+    const gh = `<a href="${pkg.homepage}/tree/${this.version}">${enc(this.name)}:${pkg.git.tag || pkg.git.short_commit}</a>${branchString}`;
     const intro = `The <code>${process.env.AWS_LAMBDA_FUNCTION_NAME}</code> lambda running ${gh} just threw the following error:`;
     const stack = `<pre>${enc(error.stack)}</pre>`;
     const logs = `&gt;&gt; <a href="${this.logUri}">CloudWatch Logs</a> &lt;&lt;`;

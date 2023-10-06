@@ -146,7 +146,7 @@ module.exports.notificationFromError = (error) => {
 };
 
 // send a Telegram message
-module.exports.pushTelegramMsg = async (message, chatId = this.chatId) => {
+module.exports.pushTelegramMsg = async (message, chatId) => {
     const noSecrets = this.removeSecrets(message);
     const noHtml = this.removeHtmlControlChars(noSecrets);
     const text = this.markdownToHtml(noHtml);

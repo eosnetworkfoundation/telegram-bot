@@ -84,7 +84,7 @@ See the pipeline documentation for more information.
 ## Inputs
 This lambda receives two primary inputs:
 1. User-defined environment variables to configure lambda behavior.
-1. AWS Simple Notification Service (SNS) event payloads delivered by AWS, where the `message` field contains a string to be delivered (almost) verbatim as a Telegram notification.
+1. AWS Simple Notification Service (SNS) event payloads delivered by AWS, where the `Message` field contains a string to be delivered (almost) verbatim as a Telegram notification.
 
 Special attention should be paid to your lambda function name(s), alarm name(s), and alarm description(s). The resource name is the only real identifier sent to the maintainer or the customer to determine where an error message is coming from, and the alarm description is included verbatim in the message body. Your resource names need to be unique enough to globally identify these resources, especially if you have multiple AWS accounts. The alarm description should be something useful. For example, to copy the AWS example below, "This alarm triggers when the US datacenter API server CPU utilization is above 50% for five minutes."
 
@@ -122,8 +122,8 @@ The SNS event schema looks like this.
         "MessageId": "f3a8c7e9-241b-4d61-9e0c-86d4b2f8c730",
         "TopicArn": "arn:aws:sns:us-east-1:123456789012:sns-topic-name-goes-here",
         "Subject": null,
-        "Message": "{\"version\":\"0\",\"id\":\"c4c1c1c9-6542-e61b-6ef0-8c4d36933a92\",\"detail-type\":\"CloudWatch Alarm State Change\",\"source\":\"aws.cloudwatch\",\"account\":\"123456789012\",\"time\":\"2019-10-02T17:04:40Z\",\"region\":\"us-east-1\",\"resources\":[\"arn:aws:cloudwatch:us-east-1:123456789012:alarm:ServerCpuTooHigh\"],\"detail\":{\"alarmName\":\"ServerCpuTooHigh\",\"configuration\":{\"description\":\"Goes into alarm when server CPU utilization is too high!\",\"metrics\":[{\"id\":\"30b6c6b2-a864-43a2-4877-c09a1afc3b87\",\"metricStat\":{\"metric\":{\"dimensions\":{\"InstanceId\":\"i-12345678901234567\"},\"name\":\"CPUUtilization\",\"namespace\":\"AWS/EC2\"},\"period\":300,\"stat\":\"Average\"},\"returnData\":true}]},\"previousState\":{\"reason\":\"Threshold Crossed: 1 out of the last 1 datapoints [0.0666851903306472 (01/10/19 13:46:00)] was not greater than the threshold (50.0) (minimum 1 datapoint for ALARM -> OK transition).\",\"reasonData\":\"{\\\"version\\\":\\\"1.0\\\",\\\"queryDate\\\":\\\"2019-10-01T13:56:40.985+0000\\\",\\\"startDate\\\":\\\"2019-10-01T13:46:00.000+0000\\\",\\\"statistic\\\":\\\"Average\\\",\\\"period\\\":300,\\\"recentDatapoints\\\":[0.0666851903306472],\\\"threshold\\\":50.0}\",\"timestamp\":\"2019-10-01T13:56:40.987+0000\",\"value\":\"OK\"},\"state\":{\"reason\":\"Threshold Crossed: 1 out of the last 1 datapoints [99.50160229693434 (02/10/19 16:59:00)] was greater than the threshold (50.0) (minimum 1 datapoint for OK -> ALARM transition).\",\"reasonData\":\"{\\\"version\\\":\\\"1.0\\\",\\\"queryDate\\\":\\\"2019-10-02T17:04:40.985+0000\\\",\\\"startDate\\\":\\\"2019-10-02T16:59:00.000+0000\\\",\\\"statistic\\\":\\\"Average\\\",\\\"period\\\":300,\\\"recentDatapoints\\\":[99.50160229693434],\\\"threshold\\\":50.0}\",\"timestamp\":\"2019-10-02T17:04:40.989+0000\",\"value\":\"ALARM\"}}}",
-        "Timestamp": "2023-09-26T00:31:17.412Z",
+        "Message": "❌ **acmecorp-us-east_server-cpu-too-high** ❌\nThe `acmecorp-us-east_server-cpu-too-high` alarm is triggered! This alarm triggers when CPU utilization of the `acmecorp-us-east` server exceeds 50% for five minutes.\n\nReason:\n```\nThreshold Crossed: 1 out of the last 1 datapoints [99.50160229693434] was greater than the threshold (50.0) (minimum 1 datapoint for OK -> ALARM transition).\n```\nTimestamp:\n```\n2019-02-10 16:59:00.412 EDT\n```\nPlease put eyes 👀 on this message if you are investigating this.",
+        "Timestamp": "2019-02-10T21:59:00.412Z",
         "SignatureVersion": "1",
         "Signature": "VG9nZXJtZW50UGxhY2Vob2xkZXIxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMA==",
         "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-s8f4a1b7c0e9d3a4e5e2b3d6a9c7b0f1.pem",
@@ -134,71 +134,12 @@ The SNS event schema looks like this.
   ]
 }
 ```
-The SNS event contains a `message` payload from CloudWatch that looks like this when unpacked.
-```json
-{
-  "version": "0",
-  "id": "c4c1c1c9-6542-e61b-6ef0-8c4d36933a92",
-  "detail-type": "CloudWatch Alarm State Change",
-  "source": "aws.cloudwatch",
-  "account": "123456789012",
-  "time": "2019-10-02T17:04:40Z",
-  "region": "us-east-1",
-  "resources": ["arn:aws:cloudwatch:us-east-1:123456789012:alarm:ServerCpuTooHigh"],
-  "detail": {
-    "alarmName": "ServerCpuTooHigh",
-    "configuration": {
-      "description": "Goes into alarm when server CPU utilization is too high!",
-      "metrics": [{
-        "id": "30b6c6b2-a864-43a2-4877-c09a1afc3b87",
-        "metricStat": {
-          "metric": {
-            "dimensions": {
-              "InstanceId": "i-12345678901234567"
-            },
-            "name": "CPUUtilization",
-            "namespace": "AWS/EC2"
-          },
-          "period": 300,
-          "stat": "Average"
-        },
-        "returnData": true
-      }]
-    },
-    "previousState": {
-      "reason": "Threshold Crossed: 1 out of the last 1 datapoints [0.0666851903306472 (01/10/19 13:46:00)] was not greater than the threshold (50.0) (minimum 1 datapoint for ALARM -> OK transition).",
-      "reasonData": "{\"version\":\"1.0\",\"queryDate\":\"2019-10-01T13:56:40.985+0000\",\"startDate\":\"2019-10-01T13:46:00.000+0000\",\"statistic\":\"Average\",\"period\":300,\"recentDatapoints\":[0.0666851903306472],\"threshold\":50.0}",
-      "timestamp": "2019-10-01T13:56:40.987+0000",
-      "value": "OK"
-    },
-    "state": {
-      "reason": "Threshold Crossed: 1 out of the last 1 datapoints [99.50160229693434 (02/10/19 16:59:00)] was greater than the threshold (50.0) (minimum 1 datapoint for OK -> ALARM transition).",
-      "reasonData": "{\"version\":\"1.0\",\"queryDate\":\"2019-10-02T17:04:40.985+0000\",\"startDate\":\"2019-10-02T16:59:00.000+0000\",\"statistic\":\"Average\",\"period\":300,\"recentDatapoints\":[99.50160229693434],\"threshold\":50.0}",
-      "timestamp": "2019-10-02T17:04:40.989+0000",
-      "value": "ALARM"
-    }
-  }
-}
-```
-The schema of this CloudWatch "alarm state change" message is also validated using `joi`.
+The `Message` property must contain a non-empty string to be delivered as a Telegram notification. The following transforms are performed on this string:
+1. Secrets are replaced with a placeholder (e.g. `${TELEGRAM_API_KEY}`), and any user-defined string replacements are performed.
+1. Any `<`, `>`, and `&` characters are turned into an HTML escape sequence, as required by Telegram.
+1. Limited markdown syntax is converted to HTML.
 
-The `reasonData` field looks like this when parsed and expanded.
-```json
-{
-  "reasonData": {
-    "version": "1.0",
-    "queryDate": "2019-10-02T17:04:40.985+0000",
-    "startDate": "2019-10-02T16:59:00.000+0000",
-    "statistic": "Average",
-    "period": 300,
-    "recentDatapoints": [
-      99.50160229693434
-    ],
-    "threshold": 50
-  }
-}
-```
-The `resultData` schema is not validated as of this writing because no fields are consumed from it. Check out the source code for definitive, up-to-date information on which fields are being consumed and what the expected schema are.
+The example payload above is the output of the [aws-cloudwatch-alarm-handler](https://github.com/eosnetworkfoundation/aws-cloudwatch-alarm-handler) lambda, which can be used to generate human-friendly notifications for arbitrary CloudWatch alarms.
 
 ## Outputs
 This lambda has three primary outputs:

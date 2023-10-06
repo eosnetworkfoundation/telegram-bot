@@ -110,12 +110,12 @@ module.exports.handler = async (event) => {
         result.statusCode = 200;
     } catch (error) {
         result.body = error;
-        console.error(this.sanitize(`FATAL: ${error.message}`), this.sanitize(error.toString()));
+        console.error(this.removeSecrets(`FATAL: ${error.message}`), this.removeSecrets(error.toString()));
         try {
             const notification = this.notificationFromError(error);
             await this.pushTelegramMsg(notification, this.chatIdOwner || this.chatId);
         } catch (err) {
-            console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', this.sanitize(err.toString()));
+            console.error('ERROR: Failed to send an error message to the maintainer\'s Telegram.', this.removeSecrets(err.toString()));
         }
     }
     return result;
@@ -137,7 +137,7 @@ module.exports.main = async (event) => {
     // send message to Telegram
     const response = await this.pushTelegramMsg(message, this.isDevSnsTopic(event) ? this.chatIdDev : this.chatIdCustomer);
     // sanitize, print, and return result
-    const result = this.sanitize(JSON.stringify(response, null, 4));
+    const result = this.removeSecrets(JSON.stringify(response, null, 4));
     console.log('Done.', result);
     return result;
 };
@@ -169,7 +169,7 @@ module.exports.pushTelegramMsg = async (message, chatId = this.chatId) => {
             chat_id: chatId,
             disable_web_page_preview: true,
             parse_mode: 'HTML',
-            text: this.sanitize(message),
+            text: this.removeSecrets(message),
         },
     });
     if (response.status >= 300) {
@@ -195,7 +195,7 @@ module.exports.readEnv = (key, writeToLog) => {
 };
 
 // try to remove secrets from a string
-module.exports.sanitize = (str) => str
+module.exports.removeSecrets = (str) => str
     /* eslint-disable no-template-curly-in-string */
     .replace(new RegExp(process.env.TELEGRAM_API_KEY, 'g'), '${TELEGRAM_API_KEY}')
     .replace(new RegExp(process.env.TELEGRAM_CHAT_ID, 'g'), '${TELEGRAM_CHAT_ID}')

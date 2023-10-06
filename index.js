@@ -123,8 +123,8 @@ Object.defineProperty(this, 'version', {
 // lambda entrypoint; try to catch, log, and notify on error
 module.exports.handler = async (event) => {
     const result = {
-        statusCode: 500,
         body: 'FATAL: Unknown error!',
+        statusCode: 500,
     };
     try {
         result.body = await this.main(event);

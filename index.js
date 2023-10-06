@@ -130,8 +130,9 @@ module.exports.handler = async (event) => {
         result.body = await this.main(event);
         result.statusCode = 200;
     } catch (error) {
-        result.body = error;
-        console.error(this.removeSecrets(`FATAL: ${error.message}`), this.removeSecrets(error.toString()));
+        const errorString = this.removeSecrets(error.toString());
+        result.body = errorString;
+        console.error(this.removeSecrets(`FATAL: ${error.message}`), errorString);
         try {
             const notification = this.notificationFromError(error);
             await this.pushTelegramMsg(notification, this.chatIdOwner || this.chatId);

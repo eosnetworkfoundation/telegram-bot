@@ -89,11 +89,6 @@ Object.defineProperty(this, 'chatIdOwner', {
     get: () => accessEnv('TELEGRAM_CHAT_ID_OWNER', false),
 });
 
-// name or contact info for the bot maintainer
-Object.defineProperty(this, 'maintainer', {
-    get: () => accessEnv('MAINTAINER'),
-});
-
 // return the log URI
 Object.defineProperty(this, 'logUri', {
     get: () => {
@@ -102,6 +97,11 @@ Object.defineProperty(this, 'logUri', {
         const logStreamName = encodeURIComponent(process.env.AWS_LAMBDA_LOG_STREAM_NAME);
         return `https://console.aws.amazon.com/cloudwatch/home?region=${region}#logsV2:log-groups/log-group/${logGroupName}/log-events/${logStreamName}`;
     },
+});
+
+// name or contact info for the bot maintainer
+Object.defineProperty(this, 'maintainer', {
+    get: () => accessEnv('MAINTAINER'),
 });
 
 // return the package name
